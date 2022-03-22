@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  event-store:
+    image: "mongo"
+    environment:
+      - MONGODB_INITDB_DATABASE=aster
+      - MONGODB_INITDB_ROOT_USERNAME=aster
+      - MONGODB_INITDB_ROOT_PASSWORD=rootpa55
+    ports:
+      - "27017:27017"
+  state-store:
+    image: "redis"
+    ports:
+      - "6379:6379"

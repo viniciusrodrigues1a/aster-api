@@ -1,0 +1,10 @@
+package factory
+
+import usecase "expense-service/cmd/expense-service/application/use-case"
+
+var eventStoreRepository = makeMongoEventStoreRepository()
+var stateStoreRepository = makeRedisStateStoreRepository()
+
+func makeCreateExpenseUseCase() *usecase.CreateExpenseUseCase {
+	return usecase.NewCreateExpenseUseCase(eventStoreRepository, stateStoreRepository)
+}

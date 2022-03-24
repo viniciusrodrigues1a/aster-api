@@ -3,23 +3,30 @@ package usecase
 import (
 	"account-service/cmd/account-service/domain/command"
 	"account-service/cmd/account-service/domain/projector"
+	"errors"
 
 	eventstorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/event-store-lib"
 	statestorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/state-store-lib"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+var ErrEmailAlreadyInUse = errors.New("email is already in use")
+
 type CreateAccountUseCase struct {
 	messageEmitter   MessageEmitter
 	eventStoreWriter eventstorelib.EventStoreStreamWriter
+	stateStoreReader statestorelib.StateStoreReader
 	stateStoreWriter statestorelib.StateStoreWriter
+	hasher           command.Hasher
 }
 
-func NewCreateAccountUseCase(m MessageEmitter, evtStore eventstorelib.EventStoreStreamWriter, sttStore statestorelib.StateStoreWriter) *CreateAccountUseCase {
+func NewCreateAccountUseCase(m MessageEmitter, evtStore eventstorelib.EventStoreStreamWriter, sttStoreW statestorelib.StateStoreWriter, sttStoreR statestorelib.StateStoreReader, hasher command.Hasher) *CreateAccountUseCase {
 	return &CreateAccountUseCase{
 		messageEmitter:   m,
 		eventStoreWriter: evtStore,
-		stateStoreWriter: sttStore,
+		stateStoreWriter: sttStoreW,
+		stateStoreReader: sttStoreR,
+		hasher:           hasher,
 	}
 }
 
@@ -34,10 +41,14 @@ type CreateInventoryCommand struct {
 }
 
 func (c *CreateAccountUseCase) Execute(request *CreateAccountUseCaseRequest) error {
-	command := command.NewCreateAccountCommand(request.Name, request.Email, request.Password)
+	command := command.NewCreateAccountCommand(request.Name, request.Email, request.Password, c.hasher)
 	event, err := command.Handle()
 	if err != nil {
 		return err
+	}
+
+	if _, err := c.stateStoreReader.ReadState(request.Email); err == nil {
+		return ErrEmailAlreadyInUse
 	}
 
 	id, err := c.eventStoreWriter.StoreEventStream(event)
@@ -48,7 +59,7 @@ func (c *CreateAccountUseCase) Execute(request *CreateAccountUseCaseRequest) err
 	projector := projector.AccountCreationProjector{}
 	state := projector.Project(event)
 
-	stateErr := c.stateStoreWriter.StoreState(id, state)
+	stateErr := c.stateStoreWriter.StoreState(request.Email, state)
 	if stateErr != nil {
 		return stateErr
 	}

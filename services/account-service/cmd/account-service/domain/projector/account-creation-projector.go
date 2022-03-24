@@ -14,5 +14,6 @@ func (a *AccountCreationProjector) Project(e *eventlib.BaseEvent) *AccountState 
 	return &AccountState{
 		Name:  payload.Name,
 		Email: payload.Email,
+		Hash:  payload.Password.Hash,
 	}
 }

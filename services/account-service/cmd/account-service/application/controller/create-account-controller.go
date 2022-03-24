@@ -27,6 +27,12 @@ func (c *CreateAccountController) HandleRequest(w http.ResponseWriter, r *http.R
 
 	err := c.useCase.Execute(&body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		var status = http.StatusInternalServerError
+
+		if err == usecase.ErrEmailAlreadyInUse {
+			status = http.StatusBadRequest
+		}
+
+		http.Error(w, err.Error(), status)
 	}
 }

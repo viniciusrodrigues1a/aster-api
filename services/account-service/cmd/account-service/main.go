@@ -5,9 +5,16 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	envErr := godotenv.Load()
+	if envErr != nil {
+		panic(envErr)
+	}
+
 	srv := server.NewServer()
 
 	go func() {

@@ -30,7 +30,9 @@ func NewServer() *server {
 }
 
 func (s *server) Start() {
-	s.router.HandleFunc("/accounts/", factory.MakeCreateAccountController().HandleRequest)
+	s.router.HandleFunc("/accounts/", factory.MakeCreateAccountController().HandleRequest).Methods("POST")
+	s.router.HandleFunc("/sessions/", factory.MakeLoginController().HandleRequest).Methods("POST")
+	s.router.HandleFunc("/sessions/", factory.MakeValidateTokenController().HandleRequest).Methods("GET")
 
 	log.Fatal(s.server.ListenAndServe())
 }

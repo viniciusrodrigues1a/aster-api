@@ -8,3 +8,7 @@ var stateStoreRepository = makeRedisStateStoreRepository()
 func makeCreateExpenseUseCase() *usecase.CreateExpenseUseCase {
 	return usecase.NewCreateExpenseUseCase(eventStoreRepository, stateStoreRepository)
 }
+
+func makeUpdateExpenseUseCase() *usecase.UpdateExpenseUseCase {
+	return usecase.NewUpdateExpenseUseCase(eventStoreRepository, stateStoreRepository, stateStoreRepository)
+}

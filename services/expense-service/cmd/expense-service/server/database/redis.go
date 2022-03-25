@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"time"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -15,7 +14,6 @@ type redisConnection struct {
 var RedisConn *redisConnection
 
 func init() {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	client := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6376",
 		Password: "",
@@ -23,7 +21,7 @@ func init() {
 	})
 
 	RedisConn = &redisConnection{
-		Context: ctx,
+		Context: context.Background(),
 		Client:  client,
 	}
 }

@@ -1,16 +1,24 @@
 package usecase
 
+import (
+	"fmt"
+
+	statestorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/state-store-lib"
+)
+
 type TokenVerifier interface {
 	Verify(token string) (interface{}, error)
 }
 
 type ValidateTokenUseCase struct {
-	tokenVerifier TokenVerifier
+	stateStoreReader statestorelib.StateStoreReader
+	tokenVerifier    TokenVerifier
 }
 
-func NewValidateTokenUseCase(tokenVerifier TokenVerifier) *ValidateTokenUseCase {
+func NewValidateTokenUseCase(sttStore statestorelib.StateStoreReader, tokenVerifier TokenVerifier) *ValidateTokenUseCase {
 	return &ValidateTokenUseCase{
-		tokenVerifier: tokenVerifier,
+		stateStoreReader: sttStore,
+		tokenVerifier:    tokenVerifier,
 	}
 }
 
@@ -19,6 +27,12 @@ type ValidateTokenUseCaseRequest struct {
 }
 
 func (v *ValidateTokenUseCase) Execute(request *ValidateTokenUseCaseRequest) error {
-	_, err := v.tokenVerifier.Verify(request.Token)
+	payload, err := v.tokenVerifier.Verify(request.Token)
+
+	_, readErr := v.stateStoreReader.ReadState(payload.(string))
+	if readErr != nil {
+		return fmt.Errorf("validateToken: account not found")
+	}
+
 	return err
 }

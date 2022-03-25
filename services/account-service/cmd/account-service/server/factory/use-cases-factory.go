@@ -28,5 +28,5 @@ func makeLoginUseCase() *usecase.LoginUseCase {
 func makeValidateTokenUseCase() *usecase.ValidateTokenUseCase {
 	jwtVerifier := jwtmanager.NewJWTManager([]byte(os.Getenv("RSA_PRIVATE_KEY")), []byte(os.Getenv("RSA_PUBLIC_KEY")))
 
-	return usecase.NewValidateTokenUseCase(jwtVerifier)
+	return usecase.NewValidateTokenUseCase(stateStoreRepository, jwtVerifier)
 }

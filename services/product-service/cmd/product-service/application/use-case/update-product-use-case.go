@@ -43,14 +43,13 @@ func (u *UpdateProductUseCase) Execute(request *UpdateProductUseCaseRequest) err
 	}
 	event := command.Handle()
 
-	id, err := u.eventStoreRepository.StoreEvent(event)
+	val, err := u.stateStoreRepository.ReadState(request.Id)
 	if err != nil {
 		return err
 	}
 
-	val, err := u.stateStoreRepository.ReadState(id)
+	id, err := u.eventStoreRepository.StoreEvent(event)
 	if err != nil {
-		fmt.Printf(err.Error())
 		return err
 	}
 

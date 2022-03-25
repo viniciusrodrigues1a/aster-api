@@ -15,3 +15,9 @@ func MakeUpdateExpenseController() *controller.UpdateExpenseController {
 
 	return controller.NewUpdateExpenseController(useCase)
 }
+
+func MakeDeleteExpenseController() *controller.DeleteExpenseController {
+	useCase := makeDeleteExpenseUseCase()
+
+	return controller.NewDeleteExpenseController(useCase)
+}

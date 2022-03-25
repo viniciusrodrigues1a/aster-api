@@ -15,5 +15,6 @@ func (p *ExpenseCreationProjector) Project(e *eventlib.BaseEvent) *ExpenseState 
 		Title:       payload.Title,
 		Description: payload.Description,
 		Value:       payload.Value,
+		CreatedAt:   e.Data.CreatedAt,
 	}
 }

@@ -9,52 +9,44 @@ import (
 	statestorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/state-store-lib"
 )
 
-type UpdateExpenseUseCase struct {
+type DeleteExpenseUseCase struct {
 	eventStoreWriter eventstorelib.EventStoreWriter
 	stateStoreReader statestorelib.StateStoreReader
 	stateStoreWriter statestorelib.StateStoreWriter
 }
 
-func NewUpdateExpenseUseCase(evtStore eventstorelib.EventStoreWriter, sttStoreR statestorelib.StateStoreReader, sttStoreW statestorelib.StateStoreWriter) *UpdateExpenseUseCase {
-	return &UpdateExpenseUseCase{
+func NewDeleteExpenseUseCase(evtStore eventstorelib.EventStoreWriter, sttStoreR statestorelib.StateStoreReader, sttStoreW statestorelib.StateStoreWriter) *DeleteExpenseUseCase {
+	return &DeleteExpenseUseCase{
 		eventStoreWriter: evtStore,
 		stateStoreReader: sttStoreR,
 		stateStoreWriter: sttStoreW,
 	}
 }
 
-type UpdateExpenseUseCaseRequest struct {
-	Id          string
-	Title       string
-	Description string
-	Value       int64
+type DeleteExpenseUseCaseRequest struct {
+	Id string
 }
 
-func (u *UpdateExpenseUseCase) Execute(request *UpdateExpenseUseCaseRequest) error {
-	command := command.UpdateExpenseCommand{
-		Id:          request.Id,
-		Title:       request.Title,
-		Description: request.Description,
-		Value:       request.Value,
-	}
+func (d *DeleteExpenseUseCase) Execute(request *DeleteExpenseUseCaseRequest) error {
+	command := command.DeleteExpenseCommand{Id: request.Id}
 	event := command.Handle()
 
-	val, err := u.stateStoreReader.ReadState(request.Id)
+	val, err := d.stateStoreReader.ReadState(request.Id)
 	if err != nil {
 		return ErrExpenseDoesntExist
 	}
 
-	id, err := u.eventStoreWriter.StoreEvent(event)
+	id, err := d.eventStoreWriter.StoreEvent(event)
 	if err != nil {
 		return err
 	}
 
 	currentState := projector.ExpenseState{}
 	json.Unmarshal([]byte(val.(string)), &currentState)
-	projector := projector.ExpenseUpdateProjector{CurrentState: &currentState}
+	projector := projector.ExpenseDeletionProjector{CurrentState: &currentState}
 	state := projector.Project(event)
 
-	stateErr := u.stateStoreWriter.StoreState(id, state)
+	stateErr := d.stateStoreWriter.StoreState(id, state)
 	if stateErr != nil {
 		return stateErr
 	}

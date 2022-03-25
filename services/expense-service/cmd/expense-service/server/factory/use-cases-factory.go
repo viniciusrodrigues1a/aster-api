@@ -12,3 +12,7 @@ func makeCreateExpenseUseCase() *usecase.CreateExpenseUseCase {
 func makeUpdateExpenseUseCase() *usecase.UpdateExpenseUseCase {
 	return usecase.NewUpdateExpenseUseCase(eventStoreRepository, stateStoreRepository, stateStoreRepository)
 }
+
+func makeDeleteExpenseUseCase() *usecase.DeleteExpenseUseCase {
+	return usecase.NewDeleteExpenseUseCase(eventStoreRepository, stateStoreRepository, stateStoreRepository)
+}

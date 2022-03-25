@@ -10,13 +10,15 @@ import (
 )
 
 type DeleteExpenseUseCase struct {
+	stateEmitter     StateEmitter
 	eventStoreWriter eventstorelib.EventStoreWriter
 	stateStoreReader statestorelib.StateStoreReader
 	stateStoreWriter statestorelib.StateStoreWriter
 }
 
-func NewDeleteExpenseUseCase(evtStore eventstorelib.EventStoreWriter, sttStoreR statestorelib.StateStoreReader, sttStoreW statestorelib.StateStoreWriter) *DeleteExpenseUseCase {
+func NewDeleteExpenseUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreWriter, sttStoreR statestorelib.StateStoreReader, sttStoreW statestorelib.StateStoreWriter) *DeleteExpenseUseCase {
 	return &DeleteExpenseUseCase{
+		stateEmitter:     sttEmitter,
 		eventStoreWriter: evtStore,
 		stateStoreReader: sttStoreR,
 		stateStoreWriter: sttStoreW,
@@ -50,6 +52,8 @@ func (d *DeleteExpenseUseCase) Execute(request *DeleteExpenseUseCaseRequest) err
 	if stateErr != nil {
 		return stateErr
 	}
+
+	d.stateEmitter.Emit(*state, id)
 
 	return nil
 }

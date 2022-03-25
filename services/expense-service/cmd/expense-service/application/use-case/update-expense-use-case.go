@@ -10,13 +10,15 @@ import (
 )
 
 type UpdateExpenseUseCase struct {
+	stateEmitter     StateEmitter
 	eventStoreWriter eventstorelib.EventStoreWriter
 	stateStoreReader statestorelib.StateStoreReader
 	stateStoreWriter statestorelib.StateStoreWriter
 }
 
-func NewUpdateExpenseUseCase(evtStore eventstorelib.EventStoreWriter, sttStoreR statestorelib.StateStoreReader, sttStoreW statestorelib.StateStoreWriter) *UpdateExpenseUseCase {
+func NewUpdateExpenseUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreWriter, sttStoreR statestorelib.StateStoreReader, sttStoreW statestorelib.StateStoreWriter) *UpdateExpenseUseCase {
 	return &UpdateExpenseUseCase{
+		stateEmitter:     sttEmitter,
 		eventStoreWriter: evtStore,
 		stateStoreReader: sttStoreR,
 		stateStoreWriter: sttStoreW,
@@ -58,6 +60,8 @@ func (u *UpdateExpenseUseCase) Execute(request *UpdateExpenseUseCaseRequest) err
 	if stateErr != nil {
 		return stateErr
 	}
+
+	u.stateEmitter.Emit(*state, id)
 
 	return nil
 }

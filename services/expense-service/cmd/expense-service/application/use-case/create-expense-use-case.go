@@ -9,12 +9,14 @@ import (
 )
 
 type CreateExpenseUseCase struct {
+	stateEmitter           StateEmitter
 	eventStoreStreamWriter eventstorelib.EventStoreStreamWriter
 	stateStoreWriter       statestorelib.StateStoreWriter
 }
 
-func NewCreateExpenseUseCase(evtStore eventstorelib.EventStoreStreamWriter, sttStore statestorelib.StateStoreWriter) *CreateExpenseUseCase {
+func NewCreateExpenseUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreStreamWriter, sttStore statestorelib.StateStoreWriter) *CreateExpenseUseCase {
 	return &CreateExpenseUseCase{
+		stateEmitter:           sttEmitter,
 		eventStoreStreamWriter: evtStore,
 		stateStoreWriter:       sttStore,
 	}
@@ -46,6 +48,8 @@ func (c *CreateExpenseUseCase) Execute(request *CreateExpenseUseCaseRequest) err
 	if stateErr != nil {
 		return stateErr
 	}
+
+	c.stateEmitter.Emit(*state, id)
 
 	return nil
 }

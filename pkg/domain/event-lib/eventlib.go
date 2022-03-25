@@ -11,7 +11,6 @@ type BaseEventData struct {
 	Id        primitive.ObjectID `bson:"id"`
 	Name      string             `bson:"name"`
 	CreatedAt int64              `bson:"created_at"`
-	DeletedAt int64              `bson:"deleted_at"`
 }
 
 type BaseEvent struct {

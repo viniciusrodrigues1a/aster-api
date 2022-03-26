@@ -33,6 +33,12 @@ github.com/viniciusrodrigues1a/aster-api v0.0.0-20220321123214-d26ae881816c h1:A
 github.com/viniciusrodrigues1a/aster-api v0.0.0-20220321123214-d26ae881816c/go.mod h1:umWcXPC3sbADSjK+m8osmsEPhgjmxANoOLsvc3dTDEw=
 github.com/viniciusrodrigues1a/aster-api v0.0.0-20220325225914-3f5f4862df2c h1:Lsj52MY0+O5Ycm4BHkLT+eXn5hEgT00XGA819a793wk=
 github.com/viniciusrodrigues1a/aster-api v0.0.0-20220325225914-3f5f4862df2c/go.mod h1:umWcXPC3sbADSjK+m8osmsEPhgjmxANoOLsvc3dTDEw=
+github.com/viniciusrodrigues1a/aster-api v0.0.0-20220326011702-81f21b695c5d h1:OWIsIKHUKGqhDL8IDG0Yzb2uenjiCBwFzKVpzMcD/T8=
+github.com/viniciusrodrigues1a/aster-api v0.0.0-20220326011702-81f21b695c5d/go.mod h1:umWcXPC3sbADSjK+m8osmsEPhgjmxANoOLsvc3dTDEw=
+github.com/viniciusrodrigues1a/aster-api v0.0.0-20220326012110-14326a708fd7 h1:k3BVe9ToSyMgQdIW7IS2lwrIje51zIqyAnFDtUJjpAw=
+github.com/viniciusrodrigues1a/aster-api v0.0.0-20220326012110-14326a708fd7/go.mod h1:umWcXPC3sbADSjK+m8osmsEPhgjmxANoOLsvc3dTDEw=
+github.com/viniciusrodrigues1a/aster-api v0.0.0-20220326012452-d177b071faa1 h1:h/VSwt0q6csBhuo5u0hXcftqHf4jWucLVTKZOUzsbbg=
+github.com/viniciusrodrigues1a/aster-api v0.0.0-20220326012452-d177b071faa1/go.mod h1:umWcXPC3sbADSjK+m8osmsEPhgjmxANoOLsvc3dTDEw=
 github.com/xdg-go/pbkdf2 v1.0.0 h1:Su7DPu48wXMwC3bs7MCNG+z4FhcyEuz5dlvchbq0B0c=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=
 github.com/xdg-go/scram v1.0.2 h1:akYIkZ28e6A96dkWNJQu3nmCzH3YfwMPQExUYDaRv7w=

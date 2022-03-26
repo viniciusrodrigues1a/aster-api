@@ -12,7 +12,7 @@ require (
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/streadway/amqp v1.0.0 // indirect
-	github.com/viniciusrodrigues1a/aster-api v0.0.0-20220325225914-3f5f4862df2c // indirect
+	github.com/viniciusrodrigues1a/aster-api v0.0.0-20220326012452-d177b071faa1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect
 	github.com/xdg-go/stringprep v1.0.2 // indirect

@@ -30,30 +30,28 @@ type DeleteExpenseUseCaseRequest struct {
 }
 
 func (d *DeleteExpenseUseCase) Execute(request *DeleteExpenseUseCaseRequest) error {
-	command := command.DeleteExpenseCommand{Id: request.Id}
-	event := command.Handle()
-
-	val, err := d.stateStoreReader.ReadState(request.Id)
-	if err != nil {
-		return ErrExpenseDoesntExist
+	command := command.DeleteExpenseCommand{
+		Id:               request.Id,
+		EventStoreWriter: d.eventStoreWriter,
+		StateStoreReader: d.stateStoreReader,
 	}
-
-	id, err := d.eventStoreWriter.StoreEvent(event)
+	event, err := command.Handle()
 	if err != nil {
 		return err
 	}
 
+	val, _ := d.stateStoreReader.ReadState(request.Id)
 	currentState := projector.ExpenseState{}
 	json.Unmarshal([]byte(val.(string)), &currentState)
 	projector := projector.ExpenseDeletionProjector{CurrentState: &currentState}
 	state := projector.Project(event)
 
-	stateErr := d.stateStoreWriter.StoreState(id, state)
+	stateErr := d.stateStoreWriter.StoreState(event.Data.StreamId.Hex(), state)
 	if stateErr != nil {
 		return stateErr
 	}
 
-	d.stateEmitter.Emit(*state, id)
+	d.stateEmitter.Emit(*state, event.Data.StreamId.Hex())
 
 	return nil
 }

@@ -34,34 +34,30 @@ type UpdateExpenseUseCaseRequest struct {
 
 func (u *UpdateExpenseUseCase) Execute(request *UpdateExpenseUseCaseRequest) error {
 	command := command.UpdateExpenseCommand{
-		Id:          request.Id,
-		Title:       request.Title,
-		Description: request.Description,
-		Value:       request.Value,
+		Id:               request.Id,
+		Title:            request.Title,
+		Description:      request.Description,
+		Value:            request.Value,
+		EventStoreWriter: u.eventStoreWriter,
+		StateStoreReader: u.stateStoreReader,
 	}
-	event := command.Handle()
-
-	val, err := u.stateStoreReader.ReadState(request.Id)
-	if err != nil {
-		return ErrExpenseDoesntExist
-	}
-
-	id, err := u.eventStoreWriter.StoreEvent(event)
+	event, err := command.Handle()
 	if err != nil {
 		return err
 	}
 
+	val, _ := u.stateStoreReader.ReadState(request.Id)
 	currentState := projector.ExpenseState{}
 	json.Unmarshal([]byte(val.(string)), &currentState)
 	projector := projector.ExpenseUpdateProjector{CurrentState: &currentState}
 	state := projector.Project(event)
 
-	stateErr := u.stateStoreWriter.StoreState(id, state)
+	stateErr := u.stateStoreWriter.StoreState(event.Data.StreamId.Hex(), state)
 	if stateErr != nil {
 		return stateErr
 	}
 
-	u.stateEmitter.Emit(*state, id)
+	u.stateEmitter.Emit(*state, event.Data.StreamId.Hex())
 
 	return nil
 }

@@ -2,6 +2,7 @@ package controller
 
 import (
 	usecase "expense-service/cmd/expense-service/application/use-case"
+	"expense-service/cmd/expense-service/domain/command"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -26,7 +27,7 @@ func (d *DeleteExpenseController) HandleRequest(w http.ResponseWriter, r *http.R
 	if err != nil {
 		status := http.StatusInternalServerError
 
-		if err == usecase.ErrExpenseDoesntExist {
+		if err == command.ErrExpenseDoesntExist {
 			status = http.StatusNotFound
 		}
 

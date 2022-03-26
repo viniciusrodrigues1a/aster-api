@@ -30,13 +30,12 @@ type CreateExpenseUseCaseRequest struct {
 
 func (c *CreateExpenseUseCase) Execute(request *CreateExpenseUseCaseRequest) error {
 	command := command.CreateExpenseCommand{
-		Title:       request.Title,
-		Description: request.Description,
-		Value:       request.Value,
+		Title:                  request.Title,
+		Description:            request.Description,
+		Value:                  request.Value,
+		EventStoreStreamWriter: c.eventStoreStreamWriter,
 	}
-	event := command.Handle()
-
-	id, err := c.eventStoreStreamWriter.StoreEventStream(event)
+	event, err := command.Handle()
 	if err != nil {
 		return err
 	}
@@ -44,12 +43,12 @@ func (c *CreateExpenseUseCase) Execute(request *CreateExpenseUseCaseRequest) err
 	projector := projector.ExpenseCreationProjector{}
 	state := projector.Project(event)
 
-	stateErr := c.stateStoreWriter.StoreState(id, state)
+	stateErr := c.stateStoreWriter.StoreState(event.Data.StreamId.Hex(), state)
 	if stateErr != nil {
 		return stateErr
 	}
 
-	c.stateEmitter.Emit(*state, id)
+	c.stateEmitter.Emit(*state, event.Data.StreamId.Hex())
 
 	return nil
 }

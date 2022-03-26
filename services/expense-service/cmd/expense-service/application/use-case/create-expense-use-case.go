@@ -28,6 +28,8 @@ type CreateExpenseUseCaseRequest struct {
 	Value       int64
 }
 
+// Issues the CreateExpenseCommand, projects the new state, stores it in the state store
+// and emits a message with the new projected state
 func (c *CreateExpenseUseCase) Execute(request *CreateExpenseUseCaseRequest) error {
 	command := command.CreateExpenseCommand{
 		Title:                  request.Title,

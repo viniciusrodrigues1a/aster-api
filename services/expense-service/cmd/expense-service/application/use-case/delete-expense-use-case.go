@@ -29,6 +29,8 @@ type DeleteExpenseUseCaseRequest struct {
 	Id string
 }
 
+// Issues the UpdateExpenseUseCase, projects the new state, stores it in the state store
+// and emits a message with the new projected state
 func (d *DeleteExpenseUseCase) Execute(request *DeleteExpenseUseCaseRequest) error {
 	command := command.DeleteExpenseCommand{
 		Id:               request.Id,

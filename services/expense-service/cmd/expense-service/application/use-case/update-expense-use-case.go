@@ -32,6 +32,8 @@ type UpdateExpenseUseCaseRequest struct {
 	Value       int64
 }
 
+// Issues the UpdateExpenseUseCase, projects the new state, stores it in the state store
+// and emits a message with the new projected state
 func (u *UpdateExpenseUseCase) Execute(request *UpdateExpenseUseCaseRequest) error {
 	command := command.UpdateExpenseCommand{
 		Id:               request.Id,

@@ -1,7 +1,6 @@
 package command
 
 import (
-	"errors"
 	"expense-service/cmd/expense-service/domain/event"
 
 	eventlib "github.com/viniciusrodrigues1a/aster-api/pkg/domain/event-lib"
@@ -9,14 +8,14 @@ import (
 	statestorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/state-store-lib"
 )
 
-var ErrExpenseDoesntExist = errors.New("expense doesn't exist")
-
 type DeleteExpenseCommand struct {
 	Id               string
 	EventStoreWriter eventstorelib.EventStoreWriter
 	StateStoreReader statestorelib.StateStoreReader
 }
 
+// Handle stores an ExpenseWasDeletedEvent to the event store and returns the resulting event.
+// returns ErrExpenseDoesntExist if it can't read the expense state from the state store.
 func (d *DeleteExpenseCommand) Handle() (*eventlib.BaseEvent, error) {
 	evt := event.NewExpenseWasDeletedEvent(d.Id)
 

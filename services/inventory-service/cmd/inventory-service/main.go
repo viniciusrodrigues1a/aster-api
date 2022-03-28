@@ -12,7 +12,7 @@ import (
 func main() {
 	go func() {
 		m := messaging.New()
-		consumer := consumer.NewAccountCreationConsumer(m, factory.MakeCreateInventoryUseCase())
+		consumer := consumer.NewCreateInventoryCommandConsumer(m, factory.MakeCreateInventoryUseCase())
 		consumer.Consume()
 	}()
 

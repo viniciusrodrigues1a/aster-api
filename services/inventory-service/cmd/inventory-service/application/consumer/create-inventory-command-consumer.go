@@ -9,13 +9,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type AccountCreationConsumer struct {
+type CreateInventoryCommandConsumer struct {
 	messaging *messaging.Messaging
 	useCase   *usecase.CreateInventoryUseCase
 }
 
-func NewAccountCreationConsumer(m *messaging.Messaging, useCase *usecase.CreateInventoryUseCase) *AccountCreationConsumer {
-	return &AccountCreationConsumer{
+func NewCreateInventoryCommandConsumer(m *messaging.Messaging, useCase *usecase.CreateInventoryUseCase) *CreateInventoryCommandConsumer {
+	return &CreateInventoryCommandConsumer{
 		messaging: m,
 		useCase:   useCase,
 	}
@@ -25,7 +25,7 @@ type accountCreationConsumerMessage struct {
 	Id primitive.ObjectID
 }
 
-func (n *AccountCreationConsumer) Consume() {
+func (n *CreateInventoryCommandConsumer) Consume() {
 	ch, err := n.messaging.Connection.Channel()
 	if err != nil {
 		log.Fatalf("Couldn't open channel: %s", err)

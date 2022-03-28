@@ -26,10 +26,8 @@ type CreateInventoryUseCaseRequest struct {
 }
 
 func (c *CreateInventoryUseCase) Execute(request *CreateInventoryUseCaseRequest) error {
-	command := command.NewCreateInventoryCommand(request.AccountId)
-	event := command.Handle()
-
-	id, err := c.eventStoreStreamWriter.StoreEventStream(event)
+	command := command.NewCreateInventoryCommand(request.AccountId, c.eventStoreStreamWriter)
+	event, err := command.Handle()
 	if err != nil {
 		return err
 	}
@@ -37,7 +35,7 @@ func (c *CreateInventoryUseCase) Execute(request *CreateInventoryUseCaseRequest)
 	projector := projector.InventoryCreationProjector{}
 	state := projector.Project(event)
 
-	stateErr := c.stateStoreWriter.StoreState(id, state)
+	stateErr := c.stateStoreWriter.StoreState(event.Data.StreamId.Hex(), state)
 	if stateErr != nil {
 		return stateErr
 	}

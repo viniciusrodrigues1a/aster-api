@@ -30,6 +30,9 @@ func NewCreateAccountCommand(name, email, password string, hasher Hasher) *Creat
 	}
 }
 
+// Handle hashes the password and stores an AccountWasCreatedEvent in the event store and returns the resulting event.
+// returns an ErrInvalidEmail if email is not valid.
+// returns an error if it can't hash the password.
 func (c *CreateAccountCommand) Handle() (*eventlib.BaseEvent, error) {
 	if !isEmailValid(c.Email) {
 		return nil, ErrInvalidEmail

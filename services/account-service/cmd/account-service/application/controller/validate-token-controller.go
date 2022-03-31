@@ -28,11 +28,11 @@ func (v *ValidateTokenController) HandleRequest(w http.ResponseWriter, r *http.R
 
 	token := strings.Split(authorizationHeader[0], " ")[1]
 
-	err := v.useCase.Execute(&usecase.ValidateTokenUseCaseRequest{Token: token})
+	email, err := v.useCase.Execute(&usecase.ValidateTokenUseCaseRequest{Token: token})
 	if err != nil {
 		http.Error(w, ErrInvalidToken.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.Write([]byte(email))
 }

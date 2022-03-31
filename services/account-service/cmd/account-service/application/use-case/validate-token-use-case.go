@@ -26,16 +26,16 @@ type ValidateTokenUseCaseRequest struct {
 	Token string
 }
 
-func (v *ValidateTokenUseCase) Execute(request *ValidateTokenUseCaseRequest) error {
+func (v *ValidateTokenUseCase) Execute(request *ValidateTokenUseCaseRequest) (string, error) {
 	payload, err := v.tokenVerifier.Verify(request.Token)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	_, readErr := v.stateStoreReader.ReadState(payload.(string))
 	if readErr != nil {
-		return fmt.Errorf("validateToken: account not found")
+		return "", fmt.Errorf("validateToken: account not found")
 	}
 
-	return nil
+	return payload.(string), nil
 }

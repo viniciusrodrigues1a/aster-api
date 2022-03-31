@@ -51,8 +51,8 @@ func (c *CreateAccountUseCase) Execute(request *CreateAccountUseCaseRequest) err
 		return ErrEmailAlreadyInUse
 	}
 
-	id, err := c.eventStoreWriter.StoreEventStream(event)
-	if err != nil {
+	_, storeErr := c.eventStoreWriter.StoreEventStream(event)
+	if storeErr != nil {
 		return err
 	}
 
@@ -64,8 +64,7 @@ func (c *CreateAccountUseCase) Execute(request *CreateAccountUseCaseRequest) err
 		return stateErr
 	}
 
-	oid, _ := primitive.ObjectIDFromHex(id)
-	c.messageEmitter.Emit(CreateInventoryCommand{Id: oid})
+	c.messageEmitter.Emit(struct{ Email string }{Email: request.Email})
 
 	return nil
 }

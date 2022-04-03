@@ -2,22 +2,27 @@ package usecase
 
 import (
 	"encoding/json"
-	"expense-service/cmd/expense-service/domain/command"
-	"expense-service/cmd/expense-service/domain/projector"
+	"transaction-service/cmd/transaction-service/domain/command"
+	"transaction-service/cmd/transaction-service/domain/projector"
 
 	eventstorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/event-store-lib"
 	statestorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/state-store-lib"
 )
 
-type UpdateExpenseUseCase struct {
+type UpdateTransactionUseCase struct {
 	stateEmitter     StateEmitter
 	eventStoreWriter eventstorelib.EventStoreWriter
 	stateStoreReader statestorelib.StateStoreReader
 	stateStoreWriter statestorelib.StateStoreWriter
 }
 
-func NewUpdateExpenseUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreWriter, sttStoreR statestorelib.StateStoreReader, sttStoreW statestorelib.StateStoreWriter) *UpdateExpenseUseCase {
-	return &UpdateExpenseUseCase{
+func NewUpdateTransactionUseCase(
+	sttEmitter StateEmitter,
+	evtStore eventstorelib.EventStoreWriter,
+	sttStoreR statestorelib.StateStoreReader,
+	sttStoreW statestorelib.StateStoreWriter,
+) *UpdateTransactionUseCase {
+	return &UpdateTransactionUseCase{
 		stateEmitter:     sttEmitter,
 		eventStoreWriter: evtStore,
 		stateStoreReader: sttStoreR,
@@ -25,35 +30,33 @@ func NewUpdateExpenseUseCase(sttEmitter StateEmitter, evtStore eventstorelib.Eve
 	}
 }
 
-type UpdateExpenseUseCaseRequest struct {
+type UpdateTransactionUseCaseRequest struct {
 	ID          string
 	AccountID   string
-	Title       string
-	Description string
-	Value       int64
+	ValuePaid   int64  `json:"value_paid"`
+	Description string `json:"description"`
 }
 
-// Issues the UpdateExpenseCommand, projects the new state, stores it in the state store
+// Issues the UpdateTransactionCommand, projects the new state, stores it in the state store
 // and emits a message with the new projected state
-func (u *UpdateExpenseUseCase) Execute(request *UpdateExpenseUseCaseRequest) error {
-	command := command.UpdateExpenseCommand{
-		Id:               request.ID,
-		Title:            request.Title,
+func (u *UpdateTransactionUseCase) Execute(request *UpdateTransactionUseCaseRequest) error {
+	cmd := command.UpdateTransactionCommand{
+		ID:               request.ID,
+		ValuePaid:        request.ValuePaid,
 		Description:      request.Description,
-		Value:            request.Value,
 		EventStoreWriter: u.eventStoreWriter,
 		StateStoreReader: u.stateStoreReader,
 	}
-	event, err := command.Handle()
+	event, err := cmd.Handle()
 	if err != nil {
 		return err
 	}
 
 	val, _ := u.stateStoreReader.ReadState(request.ID)
-	currentState := projector.ExpenseState{}
+	currentState := projector.TransactionState{}
 	json.Unmarshal([]byte(val.(string)), &currentState)
-	projector := projector.ExpenseUpdateProjector{CurrentState: &currentState}
-	state := projector.Project(event)
+	prj := projector.TransactionUpdateProjector{CurrentState: &currentState}
+	state := prj.Project(event)
 
 	stateErr := u.stateStoreWriter.StoreState(event.Data.StreamId.Hex(), state)
 	if stateErr != nil {
@@ -63,4 +66,5 @@ func (u *UpdateExpenseUseCase) Execute(request *UpdateExpenseUseCaseRequest) err
 	u.stateEmitter.Emit(*state, event.Data.StreamId.Hex(), request.AccountID)
 
 	return nil
+
 }

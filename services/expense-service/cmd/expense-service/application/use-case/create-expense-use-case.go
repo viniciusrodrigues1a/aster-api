@@ -26,6 +26,7 @@ type CreateExpenseUseCaseRequest struct {
 	Title       string
 	Description string
 	Value       int64
+	AccountId   string
 }
 
 // Issues the CreateExpenseCommand, projects the new state, stores it in the state store
@@ -50,7 +51,7 @@ func (c *CreateExpenseUseCase) Execute(request *CreateExpenseUseCaseRequest) err
 		return stateErr
 	}
 
-	c.stateEmitter.Emit(*state, event.Data.StreamId.Hex())
+	c.stateEmitter.Emit(*state, event.Data.StreamId.Hex(), request.AccountId)
 
 	return nil
 }

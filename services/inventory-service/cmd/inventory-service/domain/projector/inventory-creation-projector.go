@@ -1,19 +1,17 @@
 package projector
 
 import (
-	"inventory-service/cmd/inventory-service/domain/event"
-
-	eventlib "github.com/viniciusrodrigues1a/aster-api/pkg/domain/event-lib"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type InventoryCreationProjector struct{}
 
-func (i *InventoryCreationProjector) Project(e *eventlib.BaseEvent) *InventoryState {
-	payload := e.Payload.(event.InventoryWasCreatedEvent)
+func (i *InventoryCreationProjector) Project(id string) *InventoryState {
 
 	return &InventoryState{
-		AccountId:    payload.AccountId,
+		ID:           id,
 		Participants: []primitive.ObjectID{},
+		Expenses:     []interface{}{},
+		Transactions: []interface{}{},
 	}
 }

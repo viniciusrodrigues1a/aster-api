@@ -2,22 +2,27 @@ package usecase
 
 import (
 	"encoding/json"
-	"expense-service/cmd/expense-service/domain/command"
-	"expense-service/cmd/expense-service/domain/projector"
+	"transaction-service/cmd/transaction-service/domain/command"
+	"transaction-service/cmd/transaction-service/domain/projector"
 
 	eventstorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/event-store-lib"
 	statestorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/state-store-lib"
 )
 
-type DeleteExpenseUseCase struct {
+type DeleteTransactionUseCase struct {
 	stateEmitter     StateEmitter
 	eventStoreWriter eventstorelib.EventStoreWriter
 	stateStoreReader statestorelib.StateStoreReader
 	stateStoreWriter statestorelib.StateStoreWriter
 }
 
-func NewDeleteExpenseUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreWriter, sttStoreR statestorelib.StateStoreReader, sttStoreW statestorelib.StateStoreWriter) *DeleteExpenseUseCase {
-	return &DeleteExpenseUseCase{
+func NewDeleteTransactionUseCase(
+	sttEmitter StateEmitter,
+	evtStore eventstorelib.EventStoreWriter,
+	sttStoreR statestorelib.StateStoreReader,
+	sttStoreW statestorelib.StateStoreWriter,
+) *DeleteTransactionUseCase {
+	return &DeleteTransactionUseCase{
 		stateEmitter:     sttEmitter,
 		eventStoreWriter: evtStore,
 		stateStoreReader: sttStoreR,
@@ -25,29 +30,29 @@ func NewDeleteExpenseUseCase(sttEmitter StateEmitter, evtStore eventstorelib.Eve
 	}
 }
 
-type DeleteExpenseUseCaseRequest struct {
+type DeleteTransactionUseCaseRequest struct {
 	ID        string
 	AccountID string
 }
 
-// Issues the DeleteExpenseCommand, projects the new state, stores it in the state store
+// Issues the DeleteTransactionCommand, projects the new state, stores it in the state store
 // and emits a message with the new projected state
-func (d *DeleteExpenseUseCase) Execute(request *DeleteExpenseUseCaseRequest) error {
-	command := command.DeleteExpenseCommand{
-		Id:               request.ID,
+func (d *DeleteTransactionUseCase) Execute(request *DeleteTransactionUseCaseRequest) error {
+	cmd := command.DeleteTransactionCommand{
+		ID:               request.ID,
 		EventStoreWriter: d.eventStoreWriter,
 		StateStoreReader: d.stateStoreReader,
 	}
-	event, err := command.Handle()
+	event, err := cmd.Handle()
 	if err != nil {
 		return err
 	}
 
 	val, _ := d.stateStoreReader.ReadState(request.ID)
-	currentState := projector.ExpenseState{}
+	currentState := projector.TransactionState{}
 	json.Unmarshal([]byte(val.(string)), &currentState)
-	projector := projector.ExpenseDeletionProjector{CurrentState: &currentState}
-	state := projector.Project(event)
+	prj := projector.TransactionDeletionProjector{CurrentState: &currentState}
+	state := prj.Project(event)
 
 	stateErr := d.stateStoreWriter.StoreState(event.Data.StreamId.Hex(), state)
 	if stateErr != nil {

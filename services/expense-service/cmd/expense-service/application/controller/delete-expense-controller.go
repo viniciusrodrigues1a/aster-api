@@ -21,7 +21,10 @@ func NewDeleteExpenseController(u *usecase.DeleteExpenseUseCase) *DeleteExpenseC
 func (d *DeleteExpenseController) HandleRequest(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	request := &usecase.DeleteExpenseUseCaseRequest{Id: id}
+	request := &usecase.DeleteExpenseUseCaseRequest{
+		ID:        id,
+		AccountID: r.Context().Value("account_id").(string),
+	}
 
 	err := d.useCase.Execute(request)
 	if err != nil {

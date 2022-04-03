@@ -2,8 +2,8 @@ package messaging
 
 import (
 	"encoding/json"
-	"expense-service/cmd/expense-service/domain/projector"
 	"log"
+	"transaction-service/cmd/transaction-service/domain/projector"
 
 	"github.com/streadway/amqp"
 )
@@ -17,27 +17,25 @@ func NewExpenseEventStateEmitter(m *Messaging) *ExpenseEventStateEmitter {
 }
 
 type ExpenseEventState struct {
-	Id          string `json:"id"`
-	AccountId   string `json:"account_id"`
-	Title       string `json:"title"`
+	ID          string `json:"id"`
+	AccountID   string `json:"account_id"`
 	Description string `json:"description"`
-	Value       int64  `json:"value"`
+	ValuePaid   int64  `json:"value_paid"`
 	CreatedAt   int64  `json:"created_at"`
 	DeletedAt   int64  `json:"deleted_at,omitempty"`
 }
 
-func (e *ExpenseEventStateEmitter) Emit(state projector.ExpenseState, id string, accountId string) {
+func (e *ExpenseEventStateEmitter) Emit(state projector.TransactionState, id string, accountID string) {
 	ch, err := e.messaging.Connection.Channel()
 	if err != nil {
 		log.Fatalf("Couldn't open channel: %s", err)
 	}
 
 	eventState := ExpenseEventState{
-		Id:          id,
-		AccountId:   accountId,
-		Title:       state.Title,
+		ID:          id,
+		AccountID:   accountID,
 		Description: state.Description,
-		Value:       state.Value,
+		ValuePaid:   state.ValuePaid,
 		CreatedAt:   state.CreatedAt,
 		DeletedAt:   state.DeletedAt,
 	}
@@ -52,5 +50,5 @@ func (e *ExpenseEventStateEmitter) Emit(state projector.ExpenseState, id string,
 		Body:        bytes,
 	}
 
-	ch.Publish("event-state-transfer.direct", "expense", false, false, message)
+	ch.Publish("event-state-transfer.direct", "transaction", false, false, message)
 }

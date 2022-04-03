@@ -2,9 +2,13 @@ package factory
 
 import usecase "inventory-service/cmd/inventory-service/application/use-case"
 
+var eventStoreRepository = makeMongoEventStoreRepository()
+var stateStoreRepository = makeRedisStateStoreRepository()
+
 func MakeCreateInventoryUseCase() *usecase.CreateInventoryUseCase {
-	return usecase.NewCreateInventoryUseCase(
-		makeMongoEventStoreRepository(),
-		makeRedisStateStoreRepository(),
-	)
+	return usecase.NewCreateInventoryUseCase(eventStoreRepository, stateStoreRepository)
+}
+
+func MakeAddExpenseToInventoryUseCase() *usecase.AddExpenseToInventoryUseCase {
+	return usecase.NewAddExpenseToInventoryUseCase(eventStoreRepository, stateStoreRepository, stateStoreRepository)
 }

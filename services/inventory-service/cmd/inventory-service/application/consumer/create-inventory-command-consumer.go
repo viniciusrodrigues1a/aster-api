@@ -5,8 +5,6 @@ import (
 	usecase "inventory-service/cmd/inventory-service/application/use-case"
 	"inventory-service/cmd/inventory-service/external/messaging"
 	"log"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type CreateInventoryCommandConsumer struct {
@@ -22,7 +20,7 @@ func NewCreateInventoryCommandConsumer(m *messaging.Messaging, useCase *usecase.
 }
 
 type accountCreationConsumerMessage struct {
-	Id primitive.ObjectID
+	Email string `json:"email"`
 }
 
 func (n *CreateInventoryCommandConsumer) Consume() {
@@ -62,7 +60,7 @@ func (n *CreateInventoryCommandConsumer) Consume() {
 			var message accountCreationConsumerMessage
 			json.Unmarshal(m.Body, &message)
 
-			request := &usecase.CreateInventoryUseCaseRequest{AccountId: message.Id}
+			request := &usecase.CreateInventoryUseCaseRequest{Email: message.Email}
 			err := n.useCase.Execute(request)
 			if err != nil {
 				log.Printf("Error: `%s`", err.Error())

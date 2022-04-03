@@ -31,7 +31,8 @@ func (u *UpdateExpenseController) HandleRequest(w http.ResponseWriter, r *http.R
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	body.Id = id
+	body.ID = id
+	body.AccountID = r.Context().Value("account_id").(string)
 
 	err := u.useCase.Execute(&body)
 	if err != nil {

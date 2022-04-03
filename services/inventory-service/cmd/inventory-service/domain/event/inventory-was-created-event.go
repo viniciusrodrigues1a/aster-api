@@ -6,12 +6,12 @@ import (
 )
 
 type InventoryWasCreatedEvent struct {
-	AccountId primitive.ObjectID
+	Email string
 }
 
-func NewInventoryWasCreatedEvent(accountId primitive.ObjectID) *eventlib.BaseEvent {
+func NewInventoryWasCreatedEvent(email string) *eventlib.BaseEvent {
 	payload := InventoryWasCreatedEvent{
-		AccountId: accountId,
+		Email: email,
 	}
 
 	return eventlib.NewBaseEvent("inventory-was-created", primitive.NewObjectID(), payload)

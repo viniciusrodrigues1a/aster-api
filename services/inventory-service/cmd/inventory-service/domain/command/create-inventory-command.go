@@ -5,23 +5,22 @@ import (
 
 	eventlib "github.com/viniciusrodrigues1a/aster-api/pkg/domain/event-lib"
 	eventstorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/event-store-lib"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type CreateInventoryCommand struct {
-	AccountId              primitive.ObjectID
+	Email                  string
 	EventStoreStreamWriter eventstorelib.EventStoreStreamWriter
 }
 
-func NewCreateInventoryCommand(accountId primitive.ObjectID, evtStore eventstorelib.EventStoreStreamWriter) *CreateInventoryCommand {
+func NewCreateInventoryCommand(email string, evtStore eventstorelib.EventStoreStreamWriter) *CreateInventoryCommand {
 	return &CreateInventoryCommand{
-		AccountId:              accountId,
+		Email:                  email,
 		EventStoreStreamWriter: evtStore,
 	}
 }
 
 func (c *CreateInventoryCommand) Handle() (*eventlib.BaseEvent, error) {
-	evt := event.NewInventoryWasCreatedEvent(c.AccountId)
+	evt := event.NewInventoryWasCreatedEvent(c.Email)
 
 	_, err := c.EventStoreStreamWriter.StoreEventStream(evt)
 	if err != nil {

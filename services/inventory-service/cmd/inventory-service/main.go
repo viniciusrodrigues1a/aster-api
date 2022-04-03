@@ -10,10 +10,16 @@ import (
 )
 
 func main() {
+	m := messaging.New()
+
 	go func() {
-		m := messaging.New()
-		consumer := consumer.NewCreateInventoryCommandConsumer(m, factory.MakeCreateInventoryUseCase())
-		consumer.Consume()
+		createInventoryCommandConsumer := consumer.NewCreateInventoryCommandConsumer(m, factory.MakeCreateInventoryUseCase())
+		createInventoryCommandConsumer.Consume()
+	}()
+
+	go func() {
+		expenseEventStateConsumer := consumer.NewExpenseEventStateConsumer(m, factory.MakeAddExpenseToInventoryUseCase())
+		expenseEventStateConsumer.Consume()
 	}()
 
 	ch := make(chan os.Signal, 1)

@@ -25,6 +25,8 @@ func (c *CreateExpenseController) HandleRequest(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	body.AccountId = r.Context().Value("account_id").(string)
+
 	err := c.useCase.Execute(&body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

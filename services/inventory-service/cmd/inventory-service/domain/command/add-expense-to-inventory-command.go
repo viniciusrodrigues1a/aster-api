@@ -8,10 +8,11 @@ import (
 )
 
 type Expense struct {
-	InventoryID string
-	Title       string
-	Description string
-	Value       int64
+	TransactionID string
+	InventoryID   string
+	Title         string
+	Description   string
+	Value         int64
 }
 
 type AddExpenseToInventoryCommand struct {
@@ -19,20 +20,21 @@ type AddExpenseToInventoryCommand struct {
 	EventStoreWriter eventstorelib.EventStoreWriter
 }
 
-func NewAddExpenseToInventoryCommand(inventoryID, title, description string, value int64, evtStore eventstorelib.EventStoreWriter) *AddExpenseToInventoryCommand {
+func NewAddExpenseToInventoryCommand(transactionID, inventoryID, title, description string, value int64, evtStore eventstorelib.EventStoreWriter) *AddExpenseToInventoryCommand {
 	return &AddExpenseToInventoryCommand{
 		Expense: Expense{
-			InventoryID: inventoryID,
-			Title:       title,
-			Description: description,
-			Value:       value,
+			TransactionID: transactionID,
+			InventoryID:   inventoryID,
+			Title:         title,
+			Description:   description,
+			Value:         value,
 		},
 		EventStoreWriter: evtStore,
 	}
 }
 
 func (a *AddExpenseToInventoryCommand) Handle() (*eventlib.BaseEvent, error) {
-	evt := event.NewExpenseWasAddedToInventoryEvent(a.InventoryID, a.Title, a.Description, a.Value)
+	evt := event.NewExpenseWasAddedToInventoryEvent(a.TransactionID, a.InventoryID, a.Title, a.Description, a.Value)
 
 	_, err := a.EventStoreWriter.StoreEvent(evt)
 	if err != nil {

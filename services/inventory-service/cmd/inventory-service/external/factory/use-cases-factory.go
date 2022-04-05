@@ -12,3 +12,7 @@ func MakeCreateInventoryUseCase() *usecase.CreateInventoryUseCase {
 func MakeAddExpenseToInventoryUseCase() *usecase.AddExpenseToInventoryUseCase {
 	return usecase.NewAddExpenseToInventoryUseCase(eventStoreRepository, stateStoreRepository, stateStoreRepository)
 }
+
+func MakeAddTransactionToInventoryUseCase() *usecase.AddTransactionToInventoryUseCase {
+	return usecase.NewAddTransactionToInventoryUseCase(eventStoreRepository, stateStoreRepository, stateStoreRepository)
+}

@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"encoding/json"
-	"errors"
 	"inventory-service/cmd/inventory-service/domain/command"
 	"inventory-service/cmd/inventory-service/domain/projector"
 
@@ -10,50 +9,47 @@ import (
 	statestorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/state-store-lib"
 )
 
-var ErrInventoryDoesntExist = errors.New("Inventory doesn't exist")
-
-type AddExpenseToInventoryUseCase struct {
+type AddTransactionToInventoryUseCase struct {
 	eventStoreWriter eventstorelib.EventStoreWriter
 	stateStoreReader statestorelib.StateStoreReader
 	stateStoreWriter statestorelib.StateStoreWriter
 }
 
-func NewAddExpenseToInventoryUseCase(
+func NewAddTransactionToInventoryUseCase(
 	evtStore eventstorelib.EventStoreWriter,
 	sttStoreR statestorelib.StateStoreReader,
 	sttStoreW statestorelib.StateStoreWriter,
-) *AddExpenseToInventoryUseCase {
-	return &AddExpenseToInventoryUseCase{
+) *AddTransactionToInventoryUseCase {
+	return &AddTransactionToInventoryUseCase{
 		eventStoreWriter: evtStore,
 		stateStoreReader: sttStoreR,
 		stateStoreWriter: sttStoreW,
 	}
 }
 
-type AddExpenseToInventoryUseCaseRequest struct {
+type AddTransactionToInventoryUseCaseRequest struct {
 	ID          string `json:"id"`
 	Email       string `json:"account_id"`
-	Title       string `json:"title"`
 	Description string `json:"description"`
-	Value       int64  `json:"value"`
+	ValuePaid   int64  `json:"value_paid"`
 }
 
-func (a *AddExpenseToInventoryUseCase) Execute(request *AddExpenseToInventoryUseCaseRequest) error {
+func (a *AddTransactionToInventoryUseCase) Execute(request *AddTransactionToInventoryUseCaseRequest) error {
 	val, err := a.stateStoreReader.ReadState(request.Email)
 	if err != nil {
 		return ErrInventoryDoesntExist
 	}
-	currentState := &projector.InventoryState{}
+	currentState := projector.InventoryState{}
 	json.Unmarshal([]byte(val.(string)), &currentState)
 
-	command := command.NewAddExpenseToInventoryCommand(request.ID, currentState.ID, request.Title, request.Description, request.Value, a.eventStoreWriter)
-	event, err := command.Handle()
+	cmd := command.NewAddTransactionToInventoryCommand(request.ID, currentState.ID, request.Description, request.ValuePaid, a.eventStoreWriter)
+	event, err := cmd.Handle()
 	if err != nil {
 		return err
 	}
 
-	projector := projector.InventoryExpenseAdditionProjector{CurrentState: currentState}
-	state := projector.Project(event)
+	prj := projector.InventoryTransactionAdditionProjector{CurrentState: &currentState}
+	state := prj.Project(event)
 
 	storeErr := a.stateStoreWriter.StoreState(request.Email, state)
 	if storeErr != nil {

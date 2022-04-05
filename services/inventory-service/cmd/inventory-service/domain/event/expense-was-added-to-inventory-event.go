@@ -6,18 +6,18 @@ import (
 )
 
 type ExpenseWasAddedToInventoryEvent struct {
-	InventoryID string `json:"inventory_id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Value       int64  `json:"value"`
+	TransactionID string `json:"id"`
+	Title         string `json:"title"`
+	Description   string `json:"description"`
+	Value         int64  `json:"value"`
 }
 
-func NewExpenseWasAddedToInventoryEvent(inventoryID, title, description string, value int64) *eventlib.BaseEvent {
+func NewExpenseWasAddedToInventoryEvent(transactionID, inventoryID, title, description string, value int64) *eventlib.BaseEvent {
 	payload := ExpenseWasAddedToInventoryEvent{
-		InventoryID: inventoryID,
-		Title:       title,
-		Description: description,
-		Value:       value,
+		TransactionID: transactionID,
+		Title:         title,
+		Description:   description,
+		Value:         value,
 	}
 
 	oid, _ := primitive.ObjectIDFromHex(inventoryID)

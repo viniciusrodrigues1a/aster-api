@@ -16,7 +16,7 @@ func NewExpenseEventStateEmitter(m *Messaging) *ExpenseEventStateEmitter {
 	return &ExpenseEventStateEmitter{messaging: m}
 }
 
-type ExpenseEventState struct {
+type TransactionEventState struct {
 	ID          string `json:"id"`
 	AccountID   string `json:"account_id"`
 	Description string `json:"description"`
@@ -31,7 +31,7 @@ func (e *ExpenseEventStateEmitter) Emit(state projector.TransactionState, id str
 		log.Fatalf("Couldn't open channel: %s", err)
 	}
 
-	eventState := ExpenseEventState{
+	eventState := TransactionEventState{
 		ID:          id,
 		AccountID:   accountID,
 		Description: state.Description,

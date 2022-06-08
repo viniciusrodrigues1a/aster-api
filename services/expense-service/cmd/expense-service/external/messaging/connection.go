@@ -11,7 +11,7 @@ type Messaging struct {
 }
 
 func New() *Messaging {
-	conn, err := amqp.Dial("amqp://inventoryservice:pa55@localhost:5672/")
+	conn, err := amqp.Dial("amqp://aster:pa55@localhost:5672/")
 	if err != nil {
 		log.Fatalf("Couldn't connect to RabbitMQ: %s", err)
 	}

@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"encoding/json"
-	"fmt"
 	"product-service/cmd/product-service/domain/command"
 	"product-service/cmd/product-service/domain/projector"
 

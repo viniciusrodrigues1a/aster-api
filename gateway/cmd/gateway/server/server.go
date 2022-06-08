@@ -19,7 +19,7 @@ func New() *server {
 	router := mux.NewRouter()
 	httpServer := &http.Server{
 		Handler: router,
-		Addr:    "localhost:8081",
+		Addr:    "localhost:8080",
 	}
 
 	return &server{
@@ -29,13 +29,26 @@ func New() *server {
 }
 
 func (s *server) Start() {
-	productProxy := proxy.New("http://localhost:8080")
-	accountProxy := proxy.New("http://localhost:8081")
-	expenseProxy := proxy.New("http://localhost:8082")
+	accountsProxy := proxy.New("http://127.0.0.1:8081", "accounts")
+	sessionsProxy := proxy.New("http://127.0.0.1:8081", "sessions")
+	expensesProxy := proxy.New("http://127.0.0.1:8082", "expenses")
+	transactionsProxy := proxy.New("http://127.0.0.1:8083", "transactions")
+	productsProxy := proxy.New("http://127.0.0.1:8084", "products")
 
-	s.router.HandleFunc("/accounts/{rest:.*}", accountProxy.HandleRequest)
-	s.router.HandleFunc("/products/{rest:.*}", productProxy.HandleRequest)
-	s.router.HandleFunc("/expenses/{rest:.*}", expenseProxy.HandleRequest)
+	s.router.HandleFunc("/accounts/{rest:.*}", accountsProxy.HandleRequest)
+	s.router.HandleFunc("/accounts", accountsProxy.HandleRequest)
+
+	s.router.HandleFunc("/sessions/{rest:.*}", sessionsProxy.HandleRequest)
+	s.router.HandleFunc("/sessions", sessionsProxy.HandleRequest)
+
+	s.router.HandleFunc("/expenses/{rest:.*}", expensesProxy.HandleRequest)
+	s.router.HandleFunc("/expenses", expensesProxy.HandleRequest)
+
+	s.router.HandleFunc("/transactions/{rest:.*}", transactionsProxy.HandleRequest)
+	s.router.HandleFunc("/transactions", transactionsProxy.HandleRequest)
+
+	s.router.HandleFunc("/products/{rest:.*}", productsProxy.HandleRequest)
+	s.router.HandleFunc("/products", productsProxy.HandleRequest)
 
 	log.Fatal(s.server.ListenAndServe())
 }

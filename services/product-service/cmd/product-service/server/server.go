@@ -20,7 +20,7 @@ func NewServer() *server {
 	router := mux.NewRouter()
 	httpServer := &http.Server{
 		Handler: router,
-		Addr:    "localhost:8080",
+		Addr:    "localhost:8084",
 	}
 
 	return &server{

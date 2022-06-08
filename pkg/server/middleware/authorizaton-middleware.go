@@ -10,7 +10,7 @@ import (
 
 func AuthorizationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		req, err := http.NewRequest("GET", "http://localhost:8081/sessions/", nil)
+		req, err := http.NewRequest("GET", "http://localhost:8081/sessions", nil)
 		if err != nil {
 			log.Printf("Error: %s", err.Error())
 		}

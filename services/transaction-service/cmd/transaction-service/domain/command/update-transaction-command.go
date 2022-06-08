@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"transaction-service/cmd/transaction-service/domain/event"
 
 	eventlib "github.com/viniciusrodrigues1a/aster-api/pkg/domain/event-lib"
@@ -21,9 +20,6 @@ type UpdateTransactionCommand struct {
 // Returns ErrTransactionDoesntExist if it can't read the state from the state store
 func (u *UpdateTransactionCommand) Handle() (*eventlib.BaseEvent, error) {
 	evt := event.NewTransactionWasUpdatedEvent(u.ValuePaid, u.Description, u.ID)
-
-	fmt.Println(u.ValuePaid)
-	fmt.Println(u.Description)
 
 	_, err := u.StateStoreReader.ReadState(u.ID)
 	if err != nil {

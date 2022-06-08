@@ -39,8 +39,8 @@ type LoginUseCaseRequest struct {
 
 func (l *LoginUseCase) Execute(request *LoginUseCaseRequest) (string, error) {
 	stateJSON, err := l.stateStoreReader.ReadState(request.Email)
-	if err != nil {
-		return "", err
+	if err != nil { // email not found
+		return "", ErrInvalidCredentials
 	}
 
 	var state projector.AccountState
@@ -50,8 +50,8 @@ func (l *LoginUseCase) Execute(request *LoginUseCaseRequest) (string, error) {
 		return "", unmarshalErr
 	}
 
-	areCredentialsValid := l.hashComparer.Compare(request.Password, state.Hash)
-	if !areCredentialsValid {
+	isPasswordCorrect := l.hashComparer.Compare(request.Password, state.Hash)
+	if !isPasswordCorrect {
 		return "", ErrInvalidCredentials
 	}
 

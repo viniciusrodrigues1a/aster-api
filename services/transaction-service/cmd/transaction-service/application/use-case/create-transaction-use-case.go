@@ -24,6 +24,7 @@ func NewCreateTransactionUseCase(sttEmitter StateEmitter, evtStore eventstorelib
 
 type CreateTransactionUseCaseRequest struct {
 	AccountID   string
+	Quantity    int64  `json:"quantity"`
 	ValuePaid   int64  `json:"value_paid"`
 	Description string `json:"description"`
 }
@@ -32,6 +33,7 @@ type CreateTransactionUseCaseRequest struct {
 // and emits a message with the new projected state
 func (c *CreateTransactionUseCase) Execute(request *CreateTransactionUseCaseRequest) error {
 	cmd := command.CreateTransactionCommand{
+		Quantity:               request.Quantity,
 		ValuePaid:              request.ValuePaid,
 		Description:            request.Description,
 		EventStoreStreamWriter: c.eventStoreStreamWriter,

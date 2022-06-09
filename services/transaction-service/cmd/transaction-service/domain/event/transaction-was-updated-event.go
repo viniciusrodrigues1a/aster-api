@@ -6,12 +6,14 @@ import (
 )
 
 type TransactionWasUpdatedEvent struct {
+	Quantity    int64
 	ValuePaid   int64
 	Description string
 }
 
-func NewTransactionWasUpdatedEvent(valuePaid int64, description, id string) *eventlib.BaseEvent {
+func NewTransactionWasUpdatedEvent(quantity, valuePaid int64, description, id string) *eventlib.BaseEvent {
 	payload := &TransactionWasUpdatedEvent{
+		Quantity:    quantity,
 		ValuePaid:   valuePaid,
 		Description: description,
 	}

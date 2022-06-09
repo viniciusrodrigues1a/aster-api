@@ -8,6 +8,7 @@ import (
 )
 
 type CreateTransactionCommand struct {
+	Quantity               int64
 	ValuePaid              int64
 	Description            string
 	EventStoreStreamWriter eventstorelib.EventStoreStreamWriter
@@ -15,7 +16,11 @@ type CreateTransactionCommand struct {
 
 // Handle stores an TransactionWasCreatedEvent to the event store and returns the resulting event
 func (c *CreateTransactionCommand) Handle() (*eventlib.BaseEvent, error) {
-	evt := event.NewTransactionWasCreatedEvent(c.ValuePaid, c.Description)
+	if c.Quantity <= 0 {
+		return nil, ErrQuantityMustBeGreaterThanZero
+	}
+
+	evt := event.NewTransactionWasCreatedEvent(c.Quantity, c.ValuePaid, c.Description)
 
 	_, err := c.EventStoreStreamWriter.StoreEventStream(evt)
 	if err != nil {

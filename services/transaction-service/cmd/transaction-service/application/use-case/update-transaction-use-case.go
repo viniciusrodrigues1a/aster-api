@@ -33,6 +33,7 @@ func NewUpdateTransactionUseCase(
 type UpdateTransactionUseCaseRequest struct {
 	ID          string
 	AccountID   string
+	Quantity    int64  `json:"quantity"`
 	ValuePaid   int64  `json:"value_paid"`
 	Description string `json:"description"`
 }
@@ -42,6 +43,7 @@ type UpdateTransactionUseCaseRequest struct {
 func (u *UpdateTransactionUseCase) Execute(request *UpdateTransactionUseCaseRequest) error {
 	cmd := command.UpdateTransactionCommand{
 		ID:               request.ID,
+		Quantity:         request.Quantity,
 		ValuePaid:        request.ValuePaid,
 		Description:      request.Description,
 		EventStoreWriter: u.eventStoreWriter,

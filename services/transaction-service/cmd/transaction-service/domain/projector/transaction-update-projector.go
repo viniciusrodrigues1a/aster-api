@@ -14,6 +14,7 @@ func (p *TransactionUpdateProjector) Project(e *eventlib.BaseEvent) *Transaction
 	payload := e.Payload.(*event.TransactionWasUpdatedEvent)
 
 	return &TransactionState{
+		Quantity:    payload.Quantity,
 		ValuePaid:   payload.ValuePaid,
 		Description: payload.Description,
 		CreatedAt:   p.CurrentState.CreatedAt,

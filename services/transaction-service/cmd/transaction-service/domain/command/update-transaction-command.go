@@ -12,6 +12,7 @@ import (
 
 type UpdateTransactionCommand struct {
 	ID               string
+	Quantity         int64
 	ValuePaid        int64
 	Description      string
 	EventStoreWriter eventstorelib.EventStoreWriter
@@ -21,8 +22,6 @@ type UpdateTransactionCommand struct {
 // Handle stores a TransactionWasUpdatedEvent to the event store and returns the resulting event.
 // Returns ErrTransactionDoesntExist if it can't read the state from the state store
 func (u *UpdateTransactionCommand) Handle() (*eventlib.BaseEvent, error) {
-	evt := event.NewTransactionWasUpdatedEvent(u.ValuePaid, u.Description, u.ID)
-
 	stateString, err := u.StateStoreReader.ReadState(u.ID)
 	if err != nil {
 		return nil, ErrTransactionDoesntExist
@@ -34,6 +33,13 @@ func (u *UpdateTransactionCommand) Handle() (*eventlib.BaseEvent, error) {
 	if transaction.DeletedAt > 0 {
 		return nil, ErrTransactionDoesntExist
 	}
+
+	quantity := u.Quantity
+	if u.Quantity <= 0 {
+		quantity = transaction.Quantity
+	}
+
+	evt := event.NewTransactionWasUpdatedEvent(quantity, u.ValuePaid, u.Description, u.ID)
 
 	_, storeErr := u.EventStoreWriter.StoreEvent(evt)
 	if storeErr != nil {

@@ -30,7 +30,7 @@ func (u *UpdateExpenseCommand) Handle() (*eventlib.BaseEvent, error) {
 	}
 
 	expense := projector.ExpenseState{}
-	json.Unmarshal([]byte(stateString.(string)), &expense)
+	json.Unmarshal([]byte(stateString), &expense)
 
 	if expense.DeletedAt > 0 {
 		return nil, ErrExpenseDoesntExist

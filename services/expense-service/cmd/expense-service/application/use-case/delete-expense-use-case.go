@@ -45,7 +45,7 @@ func (d *DeleteExpenseUseCase) Execute(request *DeleteExpenseUseCaseRequest) err
 
 	val, _ := d.stateStoreReader.ReadState(request.ID)
 	currentState := projector.ExpenseState{}
-	json.Unmarshal([]byte(val.(string)), &currentState)
+	json.Unmarshal([]byte(val), &currentState)
 	projector := projector.ExpenseDeletionProjector{CurrentState: &currentState}
 	state := projector.Project(event)
 

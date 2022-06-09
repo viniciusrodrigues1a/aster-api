@@ -51,7 +51,7 @@ func (u *UpdateExpenseUseCase) Execute(request *UpdateExpenseUseCaseRequest) err
 
 	val, _ := u.stateStoreReader.ReadState(request.ID)
 	currentState := projector.ExpenseState{}
-	json.Unmarshal([]byte(val.(string)), &currentState)
+	json.Unmarshal([]byte(val), &currentState)
 	projector := projector.ExpenseUpdateProjector{CurrentState: &currentState}
 	state := projector.Project(event)
 

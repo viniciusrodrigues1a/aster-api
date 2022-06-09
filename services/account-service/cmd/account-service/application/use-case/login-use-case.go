@@ -38,14 +38,14 @@ type LoginUseCaseRequest struct {
 }
 
 func (l *LoginUseCase) Execute(request *LoginUseCaseRequest) (string, error) {
-	stateJSON, err := l.stateStoreReader.ReadState(request.Email)
+	stateString, err := l.stateStoreReader.ReadState(request.Email)
 	if err != nil { // email not found
 		return "", ErrInvalidCredentials
 	}
 
 	var state projector.AccountState
 
-	unmarshalErr := json.Unmarshal([]byte(stateJSON.(string)), &state)
+	unmarshalErr := json.Unmarshal([]byte(stateString), &state)
 	if unmarshalErr != nil {
 		return "", unmarshalErr
 	}

@@ -1,7 +1,9 @@
 package command
 
 import (
+	"encoding/json"
 	"expense-service/cmd/expense-service/domain/event"
+	"expense-service/cmd/expense-service/domain/projector"
 
 	eventlib "github.com/viniciusrodrigues1a/aster-api/pkg/domain/event-lib"
 	eventstorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/event-store-lib"
@@ -22,8 +24,15 @@ type UpdateExpenseCommand struct {
 func (u *UpdateExpenseCommand) Handle() (*eventlib.BaseEvent, error) {
 	evt := event.NewExpenseWasUpdatedEvent(u.Title, u.Description, u.Value, u.Id)
 
-	_, err := u.StateStoreReader.ReadState(u.Id)
+	stateString, err := u.StateStoreReader.ReadState(u.Id)
 	if err != nil {
+		return nil, ErrExpenseDoesntExist
+	}
+
+	expense := projector.ExpenseState{}
+	json.Unmarshal([]byte(stateString.(string)), &expense)
+
+	if expense.DeletedAt > 0 {
 		return nil, ErrExpenseDoesntExist
 	}
 

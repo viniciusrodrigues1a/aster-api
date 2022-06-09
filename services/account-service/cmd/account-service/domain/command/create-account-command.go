@@ -9,6 +9,7 @@ import (
 )
 
 var ErrInvalidEmail = errors.New("invalid email")
+var ErrPasswordIsTooShort = errors.New("password must be at least 8 characters long")
 
 type Hasher interface {
 	Hash(plaintext string) (string, error)
@@ -34,6 +35,10 @@ func NewCreateAccountCommand(name, email, password string, hasher Hasher) *Creat
 // returns an ErrInvalidEmail if email is not valid.
 // returns an error if it can't hash the password.
 func (c *CreateAccountCommand) Handle() (*eventlib.BaseEvent, error) {
+	if !isPasswordValid(c.Password) {
+		return nil, ErrPasswordIsTooShort
+	}
+
 	if !isEmailValid(c.Email) {
 		return nil, ErrInvalidEmail
 	}
@@ -44,6 +49,14 @@ func (c *CreateAccountCommand) Handle() (*eventlib.BaseEvent, error) {
 	}
 
 	return event.NewAccountWasCreatedEvent(c.Name, c.Email, hash), nil
+}
+
+func isPasswordValid(password string) bool {
+	if len(password) < 8 {
+		return false
+	}
+
+	return true
 }
 
 func isEmailValid(email string) bool {

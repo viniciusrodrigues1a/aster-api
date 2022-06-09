@@ -22,8 +22,6 @@ type UpdateExpenseCommand struct {
 // Handle stores an ExpenseWasUpdatedEvent to the event store and returns the resulting event.
 // returns ErrExpenseDoesntExist if it can't read the expense state from the state store.
 func (u *UpdateExpenseCommand) Handle() (*eventlib.BaseEvent, error) {
-	evt := event.NewExpenseWasUpdatedEvent(u.Title, u.Description, u.Value, u.Id)
-
 	stateString, err := u.StateStoreReader.ReadState(u.Id)
 	if err != nil {
 		return nil, ErrExpenseDoesntExist
@@ -35,6 +33,13 @@ func (u *UpdateExpenseCommand) Handle() (*eventlib.BaseEvent, error) {
 	if expense.DeletedAt > 0 {
 		return nil, ErrExpenseDoesntExist
 	}
+
+	title := u.Title
+	if u.Title == "" {
+		title = expense.Title
+	}
+
+	evt := event.NewExpenseWasUpdatedEvent(title, u.Description, u.Value, u.Id)
 
 	_, storeErr := u.EventStoreWriter.StoreEvent(evt)
 	if storeErr != nil {

@@ -16,6 +16,10 @@ type CreateExpenseCommand struct {
 
 // Handle stores an ExpenseWasCreatedEvent to the event store and returns the resulting event
 func (c *CreateExpenseCommand) Handle() (*eventlib.BaseEvent, error) {
+	if c.Title == "" {
+		return nil, ErrTitleIsRequired
+	}
+
 	evt := event.NewExpenseWasCreatedEvent(c.Title, c.Description, c.Value)
 
 	_, err := c.EventStoreStreamWriter.StoreEventStream(evt)

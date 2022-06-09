@@ -38,13 +38,13 @@ func (r *RedisStateStoreRepository) StoreState(id string, state interface{}) err
 }
 
 type StateStoreReader interface {
-	ReadState(id string) (interface{}, error)
+	ReadState(id string) (string, error)
 }
 
-func (r *RedisStateStoreRepository) ReadState(id string) (interface{}, error) {
+func (r *RedisStateStoreRepository) ReadState(id string) (string, error) {
 	val, err := r.Client.Get(r.Context, id).Result()
 	if err != nil {
-		return struct{}{}, err
+		return "", err
 	}
 
 	return val, nil

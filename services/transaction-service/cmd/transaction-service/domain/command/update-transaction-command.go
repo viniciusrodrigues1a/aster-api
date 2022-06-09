@@ -1,7 +1,9 @@
 package command
 
 import (
+	"encoding/json"
 	"transaction-service/cmd/transaction-service/domain/event"
+	"transaction-service/cmd/transaction-service/domain/projector"
 
 	eventlib "github.com/viniciusrodrigues1a/aster-api/pkg/domain/event-lib"
 	eventstorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/event-store-lib"
@@ -21,8 +23,15 @@ type UpdateTransactionCommand struct {
 func (u *UpdateTransactionCommand) Handle() (*eventlib.BaseEvent, error) {
 	evt := event.NewTransactionWasUpdatedEvent(u.ValuePaid, u.Description, u.ID)
 
-	_, err := u.StateStoreReader.ReadState(u.ID)
+	stateString, err := u.StateStoreReader.ReadState(u.ID)
 	if err != nil {
+		return nil, ErrTransactionDoesntExist
+	}
+
+	transaction := projector.TransactionState{}
+	json.Unmarshal([]byte(stateString), &transaction)
+
+	if transaction.DeletedAt > 0 {
 		return nil, ErrTransactionDoesntExist
 	}
 

@@ -50,7 +50,7 @@ func (d *DeleteTransactionUseCase) Execute(request *DeleteTransactionUseCaseRequ
 
 	val, _ := d.stateStoreReader.ReadState(request.ID)
 	currentState := projector.TransactionState{}
-	json.Unmarshal([]byte(val.(string)), &currentState)
+	json.Unmarshal([]byte(val), &currentState)
 	prj := projector.TransactionDeletionProjector{CurrentState: &currentState}
 	state := prj.Project(event)
 

@@ -54,7 +54,7 @@ func (u *UpdateTransactionUseCase) Execute(request *UpdateTransactionUseCaseRequ
 
 	val, _ := u.stateStoreReader.ReadState(request.ID)
 	currentState := projector.TransactionState{}
-	json.Unmarshal([]byte(val.(string)), &currentState)
+	json.Unmarshal([]byte(val), &currentState)
 	prj := projector.TransactionUpdateProjector{CurrentState: &currentState}
 	state := prj.Project(event)
 

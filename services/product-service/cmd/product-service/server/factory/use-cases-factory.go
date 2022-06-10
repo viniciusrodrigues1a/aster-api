@@ -14,5 +14,5 @@ func makeCreateProductUseCase() *usecase.CreateProductUseCase {
 }
 
 func makeUpdateProductUseCase() *usecase.UpdateProductUseCase {
-	return usecase.NewUpdateProductUseCase(eventStoreRepository, stateStoreRepository)
+	return usecase.NewUpdateProductUseCase(stateEmitter, eventStoreRepository, stateStoreRepository)
 }

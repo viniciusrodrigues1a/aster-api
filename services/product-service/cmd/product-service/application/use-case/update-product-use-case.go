@@ -15,12 +15,14 @@ type StateStoreRepository interface {
 }
 
 type UpdateProductUseCase struct {
+	stateEmitter         StateEmitter
 	eventStoreRepository eventstorelib.EventStoreWriter
 	stateStoreRepository StateStoreRepository
 }
 
-func NewUpdateProductUseCase(evtStore eventstorelib.EventStoreWriter, sttStore StateStoreRepository) *UpdateProductUseCase {
+func NewUpdateProductUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreWriter, sttStore StateStoreRepository) *UpdateProductUseCase {
 	return &UpdateProductUseCase{
+		stateEmitter:         sttEmitter,
 		eventStoreRepository: evtStore,
 		stateStoreRepository: sttStore,
 	}
@@ -65,6 +67,8 @@ func (u *UpdateProductUseCase) Execute(request *UpdateProductUseCaseRequest) err
 	if stateErr != nil {
 		return stateErr
 	}
+
+	u.stateEmitter.Emit(*state, event.Data.StreamId.Hex())
 
 	return nil
 }

@@ -11,12 +11,14 @@ import (
 )
 
 type UpdateTransactionCommand struct {
-	ID               string
-	Quantity         int64
-	ValuePaid        int64
-	Description      string
-	EventStoreWriter eventstorelib.EventStoreWriter
-	StateStoreReader statestorelib.StateStoreReader
+	ProductID               *string
+	ID                      string
+	Quantity                int64
+	ValuePaid               int64
+	Description             string
+	EventStoreWriter        eventstorelib.EventStoreWriter
+	StateStoreReader        statestorelib.StateStoreReader
+	ProductStateStoreReader statestorelib.StateStoreReader
 }
 
 // Handle stores a TransactionWasUpdatedEvent to the event store and returns the resulting event.
@@ -39,7 +41,14 @@ func (u *UpdateTransactionCommand) Handle() (*eventlib.BaseEvent, error) {
 		quantity = transaction.Quantity
 	}
 
-	evt := event.NewTransactionWasUpdatedEvent(quantity, u.ValuePaid, u.Description, u.ID)
+	if err != nil {
+		_, err := u.ProductStateStoreReader.ReadState(*u.ProductID)
+		if err != nil {
+			return nil, ErrProductCouldntBeFound
+		}
+	}
+
+	evt := event.NewTransactionWasUpdatedEvent(u.ProductID, quantity, u.ValuePaid, u.Description, u.ID)
 
 	_, storeErr := u.EventStoreWriter.StoreEvent(evt)
 	if storeErr != nil {

@@ -13,7 +13,13 @@ type TransactionUpdateProjector struct {
 func (p *TransactionUpdateProjector) Project(e *eventlib.BaseEvent) *TransactionState {
 	payload := e.Payload.(*event.TransactionWasUpdatedEvent)
 
+	productID := p.CurrentState.ProductID
+	if payload.ProductID != nil {
+		productID = payload.ProductID
+	}
+
 	return &TransactionState{
+		ProductID:   productID,
 		Quantity:    payload.Quantity,
 		ValuePaid:   payload.ValuePaid,
 		Description: payload.Description,

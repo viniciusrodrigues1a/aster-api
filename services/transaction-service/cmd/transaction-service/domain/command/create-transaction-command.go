@@ -5,13 +5,16 @@ import (
 
 	eventlib "github.com/viniciusrodrigues1a/aster-api/pkg/domain/event-lib"
 	eventstorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/event-store-lib"
+	statestorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/state-store-lib"
 )
 
 type CreateTransactionCommand struct {
-	Quantity               int64
-	ValuePaid              int64
-	Description            string
-	EventStoreStreamWriter eventstorelib.EventStoreStreamWriter
+	ProductID               *string
+	Quantity                int64
+	ValuePaid               int64
+	Description             string
+	EventStoreStreamWriter  eventstorelib.EventStoreStreamWriter
+	ProductStateStoreReader statestorelib.StateStoreReader
 }
 
 // Handle stores an TransactionWasCreatedEvent to the event store and returns the resulting event
@@ -20,7 +23,16 @@ func (c *CreateTransactionCommand) Handle() (*eventlib.BaseEvent, error) {
 		return nil, ErrQuantityMustBeGreaterThanZero
 	}
 
-	evt := event.NewTransactionWasCreatedEvent(c.Quantity, c.ValuePaid, c.Description)
+	if c.ProductID == nil {
+		return nil, ErrProductIDIsRequired
+	}
+
+	_, stateErr := c.ProductStateStoreReader.ReadState(*c.ProductID)
+	if stateErr != nil {
+		return nil, ErrProductCouldntBeFound
+	}
+
+	evt := event.NewTransactionWasCreatedEvent(c.ProductID, c.Quantity, c.ValuePaid, c.Description)
 
 	_, err := c.EventStoreStreamWriter.StoreEventStream(evt)
 	if err != nil {

@@ -10,13 +10,16 @@ import (
 )
 
 func TestUpdateTransactionCommand(t *testing.T) {
+	productID := "product-id-0"
 	cmd := UpdateTransactionCommand{
-		ID:               "transaction-id-0",
-		Quantity:         2,
-		ValuePaid:        10000,
-		Description:      "My description",
-		EventStoreWriter: &storeWriterSpy{},
-		StateStoreReader: &stateReaderSpy{},
+		ProductID:               &productID,
+		ID:                      "transaction-id-0",
+		Quantity:                2,
+		ValuePaid:               10000,
+		Description:             "My description",
+		EventStoreWriter:        &storeWriterSpy{},
+		StateStoreReader:        &stateReaderSpy{},
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	evt, err := cmd.Handle()
 	if err != nil {
@@ -24,7 +27,7 @@ func TestUpdateTransactionCommand(t *testing.T) {
 	}
 
 	got := evt
-	want := event.NewTransactionWasUpdatedEvent(cmd.Quantity, cmd.ValuePaid, cmd.Description, cmd.ID)
+	want := event.NewTransactionWasUpdatedEvent(cmd.ProductID, cmd.Quantity, cmd.ValuePaid, cmd.Description, cmd.ID)
 
 	if !cmp.Equal(got, want, cmpopts.IgnoreFields(eventlib.BaseEvent{}, "Data.Id")) {
 		t.Errorf("got %q, want %q", got, want)
@@ -34,11 +37,12 @@ func TestUpdateTransactionCommand(t *testing.T) {
 func TestUpdateTransactionCommand_CallsStoreWriterSpy(t *testing.T) {
 	spy := &storeWriterSpy{}
 	cmd := UpdateTransactionCommand{
-		ID:               "transaction-id-0",
-		ValuePaid:        10000,
-		Description:      "My description",
-		EventStoreWriter: spy,
-		StateStoreReader: &stateReaderSpy{},
+		ID:                      "transaction-id-0",
+		ValuePaid:               10000,
+		Description:             "My description",
+		EventStoreWriter:        spy,
+		StateStoreReader:        &stateReaderSpy{},
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	_, err := cmd.Handle()
 	if err != nil {
@@ -53,11 +57,12 @@ func TestUpdateTransactionCommand_CallsStoreWriterSpy(t *testing.T) {
 func TestUpdateTransactionCommand_CallsStateReaderSpy(t *testing.T) {
 	spy := &stateReaderSpy{}
 	cmd := UpdateTransactionCommand{
-		ID:               "transaction-id-0",
-		ValuePaid:        10000,
-		Description:      "My description",
-		EventStoreWriter: &storeWriterSpy{},
-		StateStoreReader: spy,
+		ID:                      "transaction-id-0",
+		ValuePaid:               10000,
+		Description:             "My description",
+		EventStoreWriter:        &storeWriterSpy{},
+		StateStoreReader:        spy,
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	_, err := cmd.Handle()
 	if err != nil {
@@ -72,11 +77,12 @@ func TestUpdateTransactionCommand_CallsStateReaderSpy(t *testing.T) {
 func TestUpdateTransactionCommand_ReturnStoreWriterError(t *testing.T) {
 	spy := &storeWriterErrorSpy{}
 	cmd := UpdateTransactionCommand{
-		ID:               "transaction-id-0",
-		ValuePaid:        10000,
-		Description:      "My description",
-		EventStoreWriter: spy,
-		StateStoreReader: &stateReaderSpy{},
+		ID:                      "transaction-id-0",
+		ValuePaid:               10000,
+		Description:             "My description",
+		EventStoreWriter:        spy,
+		StateStoreReader:        &stateReaderSpy{},
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	_, err := cmd.Handle()
 
@@ -91,11 +97,12 @@ func TestUpdateTransactionCommand_ReturnStoreWriterError(t *testing.T) {
 func TestUpdateTransactionCommand_ReturnStateReaderError(t *testing.T) {
 	spy := &stateReaderErrorSpy{}
 	cmd := UpdateTransactionCommand{
-		ID:               "transaction-id-0",
-		ValuePaid:        10000,
-		Description:      "My description",
-		EventStoreWriter: &storeWriterSpy{},
-		StateStoreReader: spy,
+		ID:                      "transaction-id-0",
+		ValuePaid:               10000,
+		Description:             "My description",
+		EventStoreWriter:        &storeWriterSpy{},
+		StateStoreReader:        spy,
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	_, err := cmd.Handle()
 

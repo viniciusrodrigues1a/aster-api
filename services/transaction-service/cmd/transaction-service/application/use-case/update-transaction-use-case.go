@@ -10,10 +10,11 @@ import (
 )
 
 type UpdateTransactionUseCase struct {
-	stateEmitter     StateEmitter
-	eventStoreWriter eventstorelib.EventStoreWriter
-	stateStoreReader statestorelib.StateStoreReader
-	stateStoreWriter statestorelib.StateStoreWriter
+	stateEmitter            StateEmitter
+	eventStoreWriter        eventstorelib.EventStoreWriter
+	stateStoreReader        statestorelib.StateStoreReader
+	productStateStoreReader statestorelib.StateStoreReader
+	stateStoreWriter        statestorelib.StateStoreWriter
 }
 
 func NewUpdateTransactionUseCase(
@@ -21,16 +22,19 @@ func NewUpdateTransactionUseCase(
 	evtStore eventstorelib.EventStoreWriter,
 	sttStoreR statestorelib.StateStoreReader,
 	sttStoreW statestorelib.StateStoreWriter,
+	productSttStoreR statestorelib.StateStoreReader,
 ) *UpdateTransactionUseCase {
 	return &UpdateTransactionUseCase{
-		stateEmitter:     sttEmitter,
-		eventStoreWriter: evtStore,
-		stateStoreReader: sttStoreR,
-		stateStoreWriter: sttStoreW,
+		stateEmitter:            sttEmitter,
+		eventStoreWriter:        evtStore,
+		stateStoreReader:        sttStoreR,
+		stateStoreWriter:        sttStoreW,
+		productStateStoreReader: productSttStoreR,
 	}
 }
 
 type UpdateTransactionUseCaseRequest struct {
+	ProductID   *string `json:"product_id"`
 	ID          string
 	AccountID   string
 	Quantity    int64  `json:"quantity"`
@@ -42,12 +46,14 @@ type UpdateTransactionUseCaseRequest struct {
 // and emits a message with the new projected state
 func (u *UpdateTransactionUseCase) Execute(request *UpdateTransactionUseCaseRequest) error {
 	cmd := command.UpdateTransactionCommand{
-		ID:               request.ID,
-		Quantity:         request.Quantity,
-		ValuePaid:        request.ValuePaid,
-		Description:      request.Description,
-		EventStoreWriter: u.eventStoreWriter,
-		StateStoreReader: u.stateStoreReader,
+		ProductID:               request.ProductID,
+		ID:                      request.ID,
+		Quantity:                request.Quantity,
+		ValuePaid:               request.ValuePaid,
+		Description:             request.Description,
+		EventStoreWriter:        u.eventStoreWriter,
+		StateStoreReader:        u.stateStoreReader,
+		ProductStateStoreReader: u.productStateStoreReader,
 	}
 	event, err := cmd.Handle()
 	if err != nil {

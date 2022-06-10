@@ -10,11 +10,14 @@ import (
 )
 
 func TestCreateTransactionCommand(t *testing.T) {
+	productID := "product-id-0"
 	cmd := CreateTransactionCommand{
-		ValuePaid:              10000,
-		Quantity:               3,
-		Description:            "My description",
-		EventStoreStreamWriter: &streamWriterSpy{},
+		ProductID:               &productID,
+		ValuePaid:               10000,
+		Quantity:                3,
+		Description:             "My description",
+		EventStoreStreamWriter:  &streamWriterSpy{},
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	evt, err := cmd.Handle()
 	if err != nil {
@@ -22,7 +25,7 @@ func TestCreateTransactionCommand(t *testing.T) {
 	}
 
 	got := evt
-	want := event.NewTransactionWasCreatedEvent(cmd.Quantity, cmd.ValuePaid, cmd.Description)
+	want := event.NewTransactionWasCreatedEvent(cmd.ProductID, cmd.Quantity, cmd.ValuePaid, cmd.Description)
 
 	if !cmp.Equal(got, want, cmpopts.IgnoreFields(eventlib.BaseEvent{}, "Data.StreamId", "Data.Id")) {
 		t.Errorf("got %q, want %q", got, want)
@@ -32,10 +35,11 @@ func TestCreateTransactionCommand(t *testing.T) {
 func TestCreateTransactionCommand_CallsStreamWriterSpy(t *testing.T) {
 	spy := &streamWriterSpy{}
 	cmd := CreateTransactionCommand{
-		ValuePaid:              10000,
-		Quantity:               1,
-		Description:            "My description",
-		EventStoreStreamWriter: spy,
+		ValuePaid:               10000,
+		Quantity:                1,
+		Description:             "My description",
+		EventStoreStreamWriter:  spy,
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	_, err := cmd.Handle()
 	if err != nil {
@@ -50,10 +54,11 @@ func TestCreateTransactionCommand_CallsStreamWriterSpy(t *testing.T) {
 func TestCreateTransactionCommand_ReturnStreamWriterError(t *testing.T) {
 	spy := &streamWriterErrorSpy{}
 	cmd := CreateTransactionCommand{
-		ValuePaid:              10000,
-		Quantity:               1,
-		Description:            "My description",
-		EventStoreStreamWriter: spy,
+		ValuePaid:               10000,
+		Quantity:                1,
+		Description:             "My description",
+		EventStoreStreamWriter:  spy,
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	_, err := cmd.Handle()
 
@@ -67,10 +72,11 @@ func TestCreateTransactionCommand_ReturnStreamWriterError(t *testing.T) {
 
 func TestCreateTransactionCommand_ReturnErrQuantityMustBeGreaterThanZero(t *testing.T) {
 	cmd := CreateTransactionCommand{
-		ValuePaid:              10000,
-		Quantity:               0,
-		Description:            "My description",
-		EventStoreStreamWriter: &streamWriterSpy{},
+		ValuePaid:               10000,
+		Quantity:                0,
+		Description:             "My description",
+		EventStoreStreamWriter:  &streamWriterSpy{},
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	_, err := cmd.Handle()
 

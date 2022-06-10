@@ -14,7 +14,7 @@ func (p *ExpenseUpdateProjector) Project(e *eventlib.BaseEvent) *ExpenseState {
 	payload := e.Payload.(*event.ExpenseWasUpdatedEvent)
 
 	var productID *string = p.CurrentState.ProductID
-	if productID != nil {
+	if payload.ProductID != nil {
 		productID = payload.ProductID
 	}
 

@@ -9,20 +9,23 @@ import (
 )
 
 type CreateTransactionUseCase struct {
-	stateEmitter           StateEmitter
-	eventStoreStreamWriter eventstorelib.EventStoreStreamWriter
-	stateStoreWriter       statestorelib.StateStoreWriter
+	stateEmitter            StateEmitter
+	eventStoreStreamWriter  eventstorelib.EventStoreStreamWriter
+	stateStoreWriter        statestorelib.StateStoreWriter
+	productStateStoreReader statestorelib.StateStoreReader
 }
 
-func NewCreateTransactionUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreStreamWriter, sttStore statestorelib.StateStoreWriter) *CreateTransactionUseCase {
+func NewCreateTransactionUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreStreamWriter, sttStore statestorelib.StateStoreWriter, productSttStoreR statestorelib.StateStoreReader) *CreateTransactionUseCase {
 	return &CreateTransactionUseCase{
-		stateEmitter:           sttEmitter,
-		eventStoreStreamWriter: evtStore,
-		stateStoreWriter:       sttStore,
+		stateEmitter:            sttEmitter,
+		eventStoreStreamWriter:  evtStore,
+		stateStoreWriter:        sttStore,
+		productStateStoreReader: productSttStoreR,
 	}
 }
 
 type CreateTransactionUseCaseRequest struct {
+	ProductID   *string `json:"product_id"`
 	AccountID   string
 	Quantity    int64  `json:"quantity"`
 	ValuePaid   int64  `json:"value_paid"`
@@ -33,10 +36,12 @@ type CreateTransactionUseCaseRequest struct {
 // and emits a message with the new projected state
 func (c *CreateTransactionUseCase) Execute(request *CreateTransactionUseCaseRequest) error {
 	cmd := command.CreateTransactionCommand{
-		Quantity:               request.Quantity,
-		ValuePaid:              request.ValuePaid,
-		Description:            request.Description,
-		EventStoreStreamWriter: c.eventStoreStreamWriter,
+		ProductID:               request.ProductID,
+		Quantity:                request.Quantity,
+		ValuePaid:               request.ValuePaid,
+		Description:             request.Description,
+		EventStoreStreamWriter:  c.eventStoreStreamWriter,
+		ProductStateStoreReader: c.productStateStoreReader,
 	}
 	event, err := cmd.Handle()
 	if err != nil {

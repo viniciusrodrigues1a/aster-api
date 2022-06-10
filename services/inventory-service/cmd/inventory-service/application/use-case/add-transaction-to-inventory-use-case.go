@@ -40,7 +40,7 @@ func (a *AddTransactionToInventoryUseCase) Execute(request *AddTransactionToInve
 		return ErrInventoryDoesntExist
 	}
 	currentState := projector.InventoryState{}
-	json.Unmarshal([]byte(val.(string)), &currentState)
+	json.Unmarshal([]byte(val), &currentState)
 
 	cmd := command.NewAddTransactionToInventoryCommand(request.ID, currentState.ID, request.Description, request.ValuePaid, a.eventStoreWriter)
 	event, err := cmd.Handle()

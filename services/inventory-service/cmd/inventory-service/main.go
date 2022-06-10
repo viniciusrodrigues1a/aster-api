@@ -5,11 +5,18 @@ import (
 	"inventory-service/cmd/inventory-service/application/consumer"
 	"inventory-service/cmd/inventory-service/external/factory"
 	"inventory-service/cmd/inventory-service/external/messaging"
+	"inventory-service/cmd/inventory-service/server"
 	"os"
 	"os/signal"
 )
 
 func main() {
+	srv := server.NewServer()
+
+	go func() {
+		srv.Start()
+	}()
+
 	m := messaging.New()
 
 	go func() {

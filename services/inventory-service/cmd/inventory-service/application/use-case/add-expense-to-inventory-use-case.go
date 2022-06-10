@@ -44,7 +44,7 @@ func (a *AddExpenseToInventoryUseCase) Execute(request *AddExpenseToInventoryUse
 		return ErrInventoryDoesntExist
 	}
 	currentState := &projector.InventoryState{}
-	json.Unmarshal([]byte(val.(string)), &currentState)
+	json.Unmarshal([]byte(val), &currentState)
 
 	command := command.NewAddExpenseToInventoryCommand(request.ID, currentState.ID, request.Title, request.Description, request.Value, a.eventStoreWriter)
 	event, err := command.Handle()

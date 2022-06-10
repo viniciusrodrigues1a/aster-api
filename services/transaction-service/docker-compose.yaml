@@ -13,3 +13,7 @@ services:
     image: "redis"
     ports:
       - "6375:6379"
+  product-state-store:
+    image: "redis"
+    ports:
+      - "6380:6379"

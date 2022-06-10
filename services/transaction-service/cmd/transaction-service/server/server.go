@@ -44,4 +44,5 @@ func (s *server) Stop() {
 	s.server.Shutdown(ctx)
 	database.StopMongo()
 	database.StopRedis()
+	database.StopProductRedis()
 }

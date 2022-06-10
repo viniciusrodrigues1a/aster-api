@@ -9,12 +9,14 @@ import (
 )
 
 type CreateProductUseCase struct {
+	stateEmitter         StateEmitter
 	eventStoreRepository eventstorelib.EventStoreStreamWriter
 	stateStoreRepository statestorelib.StateStoreWriter
 }
 
-func NewCreateProductUseCase(evtStore eventstorelib.EventStoreStreamWriter, sttStore statestorelib.StateStoreWriter) *CreateProductUseCase {
+func NewCreateProductUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreStreamWriter, sttStore statestorelib.StateStoreWriter) *CreateProductUseCase {
 	return &CreateProductUseCase{
+		stateEmitter:         sttEmitter,
 		eventStoreRepository: evtStore,
 		stateStoreRepository: sttStore,
 	}
@@ -50,6 +52,8 @@ func (c *CreateProductUseCase) Execute(request *CreateProductUseCaseRequest) err
 	if stateErr != nil {
 		return stateErr
 	}
+
+	c.stateEmitter.Emit(*state, event.Data.StreamId.Hex())
 
 	return nil
 }

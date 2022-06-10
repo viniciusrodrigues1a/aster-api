@@ -7,7 +7,7 @@ import (
 
 var eventStoreRepository = makeMongoEventStoreRepository()
 var stateStoreRepository = makeRedisStateStoreRepository()
-var stateEmitter = messaging.NewExpenseEventStateEmitter(messaging.New())
+var stateEmitter = messaging.NewTransactionEventStateEmitter(messaging.New())
 
 func makeCreateTransactionUseCase() *usecase.CreateTransactionUseCase {
 	return usecase.NewCreateTransactionUseCase(stateEmitter, eventStoreRepository, stateStoreRepository)

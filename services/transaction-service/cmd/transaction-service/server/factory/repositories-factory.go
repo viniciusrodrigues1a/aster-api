@@ -14,3 +14,7 @@ func makeMongoEventStoreRepository() *eventstorelib.MongoEventStoreRepository {
 func makeRedisStateStoreRepository() *statestorelib.RedisStateStoreRepository {
 	return statestorelib.New(database.RedisConn.Context, database.RedisConn.Client)
 }
+
+func MakeProductRedisStateStoreRepository() *statestorelib.RedisStateStoreRepository {
+	return statestorelib.New(database.ProductRedisConn.Context, database.ProductRedisConn.Client)
+}

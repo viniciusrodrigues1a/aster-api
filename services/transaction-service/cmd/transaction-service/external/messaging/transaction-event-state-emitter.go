@@ -8,12 +8,12 @@ import (
 	"github.com/streadway/amqp"
 )
 
-type ExpenseEventStateEmitter struct {
+type TransactionEventStateEmitter struct {
 	messaging *Messaging
 }
 
-func NewExpenseEventStateEmitter(m *Messaging) *ExpenseEventStateEmitter {
-	return &ExpenseEventStateEmitter{messaging: m}
+func NewTransactionEventStateEmitter(m *Messaging) *TransactionEventStateEmitter {
+	return &TransactionEventStateEmitter{messaging: m}
 }
 
 type TransactionEventState struct {
@@ -25,7 +25,7 @@ type TransactionEventState struct {
 	DeletedAt   int64  `json:"deleted_at,omitempty"`
 }
 
-func (e *ExpenseEventStateEmitter) Emit(state projector.TransactionState, id string, accountID string) {
+func (e *TransactionEventStateEmitter) Emit(state projector.TransactionState, id string, accountID string) {
 	ch, err := e.messaging.Connection.Channel()
 	if err != nil {
 		log.Fatalf("Couldn't open channel: %s", err)

@@ -46,16 +46,16 @@ type stateReaderSpy struct {
 	calledTimes int
 }
 
-func (s *stateReaderSpy) ReadState(key string) (interface{}, error) {
+func (s *stateReaderSpy) ReadState(key string) (string, error) {
 	s.calledTimes += 1
-	return struct{}{}, nil
+	return "", nil
 }
 
 type stateReaderErrorSpy struct {
 	thrown error
 }
 
-func (s *stateReaderErrorSpy) ReadState(key string) (interface{}, error) {
+func (s *stateReaderErrorSpy) ReadState(key string) (string, error) {
 	s.thrown = ErrTransactionDoesntExist
-	return struct{}{}, ErrTransactionDoesntExist
+	return "", ErrTransactionDoesntExist
 }

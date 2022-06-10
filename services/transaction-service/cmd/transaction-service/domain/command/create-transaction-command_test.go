@@ -12,6 +12,7 @@ import (
 func TestCreateTransactionCommand(t *testing.T) {
 	cmd := CreateTransactionCommand{
 		ValuePaid:              10000,
+		Quantity:               3,
 		Description:            "My description",
 		EventStoreStreamWriter: &streamWriterSpy{},
 	}
@@ -21,7 +22,7 @@ func TestCreateTransactionCommand(t *testing.T) {
 	}
 
 	got := evt
-	want := event.NewTransactionWasCreatedEvent(cmd.ValuePaid, cmd.Description)
+	want := event.NewTransactionWasCreatedEvent(cmd.Quantity, cmd.ValuePaid, cmd.Description)
 
 	if !cmp.Equal(got, want, cmpopts.IgnoreFields(eventlib.BaseEvent{}, "Data.StreamId", "Data.Id")) {
 		t.Errorf("got %q, want %q", got, want)
@@ -32,6 +33,7 @@ func TestCreateTransactionCommand_CallsStreamWriterSpy(t *testing.T) {
 	spy := &streamWriterSpy{}
 	cmd := CreateTransactionCommand{
 		ValuePaid:              10000,
+		Quantity:               1,
 		Description:            "My description",
 		EventStoreStreamWriter: spy,
 	}
@@ -49,6 +51,7 @@ func TestCreateTransactionCommand_ReturnStreamWriterError(t *testing.T) {
 	spy := &streamWriterErrorSpy{}
 	cmd := CreateTransactionCommand{
 		ValuePaid:              10000,
+		Quantity:               1,
 		Description:            "My description",
 		EventStoreStreamWriter: spy,
 	}
@@ -58,6 +61,23 @@ func TestCreateTransactionCommand_ReturnStreamWriterError(t *testing.T) {
 	want := spy.thrown
 
 	if err != spy.thrown {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}
+
+func TestCreateTransactionCommand_ReturnErrQuantityMustBeGreaterThanZero(t *testing.T) {
+	cmd := CreateTransactionCommand{
+		ValuePaid:              10000,
+		Quantity:               0,
+		Description:            "My description",
+		EventStoreStreamWriter: &streamWriterSpy{},
+	}
+	_, err := cmd.Handle()
+
+	got := err
+	want := ErrQuantityMustBeGreaterThanZero
+
+	if !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 		t.Errorf("got %q, want %q", got, want)
 	}
 }

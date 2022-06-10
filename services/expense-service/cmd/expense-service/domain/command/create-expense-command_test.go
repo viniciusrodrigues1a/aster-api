@@ -64,3 +64,19 @@ func TestCreateExpenseCommand_ReturnStreamWriterError(t *testing.T) {
 		t.Errorf("got %q, wanted %q", got, want)
 	}
 }
+
+func TestCreateExpenseCommand_ReturnsErrTitleIsRequired(t *testing.T) {
+	cmd := CreateExpenseCommand{
+		Description:            "My description",
+		Value:                  300,
+		EventStoreStreamWriter: &streamWriterSpy{},
+	}
+	_, err := cmd.Handle()
+
+	got := err
+	want := ErrTitleIsRequired
+
+	if !cmp.Equal(got, want, cmpopts.EquateErrors()) {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}

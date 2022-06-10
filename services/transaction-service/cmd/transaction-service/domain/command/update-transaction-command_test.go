@@ -12,6 +12,7 @@ import (
 func TestUpdateTransactionCommand(t *testing.T) {
 	cmd := UpdateTransactionCommand{
 		ID:               "transaction-id-0",
+		Quantity:         2,
 		ValuePaid:        10000,
 		Description:      "My description",
 		EventStoreWriter: &storeWriterSpy{},
@@ -23,7 +24,7 @@ func TestUpdateTransactionCommand(t *testing.T) {
 	}
 
 	got := evt
-	want := event.NewTransactionWasUpdatedEvent(cmd.ValuePaid, cmd.Description, cmd.ID)
+	want := event.NewTransactionWasUpdatedEvent(cmd.Quantity, cmd.ValuePaid, cmd.Description, cmd.ID)
 
 	if !cmp.Equal(got, want, cmpopts.IgnoreFields(eventlib.BaseEvent{}, "Data.Id")) {
 		t.Errorf("got %q, want %q", got, want)

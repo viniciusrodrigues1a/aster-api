@@ -1,6 +1,7 @@
 package projector
 
 type ExpenseState struct {
+	ProductID   *string
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Value       int64  `json:"value"`

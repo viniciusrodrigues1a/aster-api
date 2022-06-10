@@ -13,7 +13,13 @@ type ExpenseUpdateProjector struct {
 func (p *ExpenseUpdateProjector) Project(e *eventlib.BaseEvent) *ExpenseState {
 	payload := e.Payload.(*event.ExpenseWasUpdatedEvent)
 
+	var productID *string = p.CurrentState.ProductID
+	if productID != nil {
+		productID = payload.ProductID
+	}
+
 	return &ExpenseState{
+		ProductID:   productID,
 		Title:       payload.Title,
 		Description: payload.Description,
 		Value:       payload.Value,

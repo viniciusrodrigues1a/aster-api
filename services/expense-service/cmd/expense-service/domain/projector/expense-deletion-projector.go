@@ -12,6 +12,7 @@ type ExpenseDeletionProjector struct {
 
 func (p *ExpenseDeletionProjector) Project(e *eventlib.BaseEvent) *ExpenseState {
 	return &ExpenseState{
+		ProductID:   p.CurrentState.ProductID,
 		Title:       p.CurrentState.Title,
 		Description: p.CurrentState.Description,
 		Value:       p.CurrentState.Value,

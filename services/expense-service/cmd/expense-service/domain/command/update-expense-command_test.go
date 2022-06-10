@@ -10,13 +10,16 @@ import (
 )
 
 func TestUpdateExpenseCommand(t *testing.T) {
+	productID := "product-id-0"
 	cmd := UpdateExpenseCommand{
-		Id:               "expense-id-0",
-		Title:            "My expense",
-		Description:      "My description",
-		Value:            300,
-		EventStoreWriter: &storeWriterSpy{},
-		StateStoreReader: &stateReaderSpy{},
+		ProductID:               &productID,
+		ID:                      "expense-id-0",
+		Title:                   "My expense",
+		Description:             "My description",
+		Value:                   300,
+		EventStoreWriter:        &storeWriterSpy{},
+		StateStoreReader:        &stateReaderSpy{},
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	evt, err := cmd.Handle()
 	if err != nil {
@@ -24,7 +27,7 @@ func TestUpdateExpenseCommand(t *testing.T) {
 	}
 
 	got := evt
-	want := event.NewExpenseWasUpdatedEvent(cmd.Title, cmd.Description, cmd.Value, cmd.Id)
+	want := event.NewExpenseWasUpdatedEvent(cmd.ProductID, cmd.Title, cmd.Description, cmd.Value, cmd.ID)
 
 	if !cmp.Equal(got, want, cmpopts.IgnoreFields(eventlib.BaseEvent{}, "Data.Id")) {
 		t.Errorf("got %q, want %q", got, want)
@@ -34,7 +37,7 @@ func TestUpdateExpenseCommand(t *testing.T) {
 func TestUpdateExpenseCommand_CallsStoreWriterSpy(t *testing.T) {
 	spy := &storeWriterSpy{}
 	cmd := UpdateExpenseCommand{
-		Id:               "expense-id-0",
+		ID:               "expense-id-0",
 		Title:            "My expense",
 		Description:      "My description",
 		Value:            300,
@@ -54,7 +57,7 @@ func TestUpdateExpenseCommand_CallsStoreWriterSpy(t *testing.T) {
 func TestUpdateExpenseCommand_CallsStateReaderSpy(t *testing.T) {
 	spy := &stateReaderSpy{}
 	cmd := UpdateExpenseCommand{
-		Id:               "expense-id-0",
+		ID:               "expense-id-0",
 		Title:            "My expense",
 		Description:      "My description",
 		Value:            300,
@@ -74,7 +77,7 @@ func TestUpdateExpenseCommand_CallsStateReaderSpy(t *testing.T) {
 func TestUpdateExpenseCommand_ReturnStoreWriterError(t *testing.T) {
 	spy := &storeWriterErrorSpy{}
 	cmd := UpdateExpenseCommand{
-		Id:               "expense-id-0",
+		ID:               "expense-id-0",
 		Title:            "My expense",
 		Description:      "My description",
 		Value:            300,
@@ -94,7 +97,7 @@ func TestUpdateExpenseCommand_ReturnStoreWriterError(t *testing.T) {
 func TestUpdateExpenseCommand_ReturnStateReaderError(t *testing.T) {
 	spy := &stateReaderErrorSpy{}
 	cmd := UpdateExpenseCommand{
-		Id:               "expense-id-0",
+		ID:               "expense-id-0",
 		Title:            "My expense",
 		Description:      "My description",
 		Value:            300,

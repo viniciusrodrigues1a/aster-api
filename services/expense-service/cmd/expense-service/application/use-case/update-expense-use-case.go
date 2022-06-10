@@ -10,22 +10,25 @@ import (
 )
 
 type UpdateExpenseUseCase struct {
-	stateEmitter     StateEmitter
-	eventStoreWriter eventstorelib.EventStoreWriter
-	stateStoreReader statestorelib.StateStoreReader
-	stateStoreWriter statestorelib.StateStoreWriter
+	stateEmitter            StateEmitter
+	eventStoreWriter        eventstorelib.EventStoreWriter
+	stateStoreReader        statestorelib.StateStoreReader
+	stateStoreWriter        statestorelib.StateStoreWriter
+	productStateStoreReader statestorelib.StateStoreReader
 }
 
-func NewUpdateExpenseUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreWriter, sttStoreR statestorelib.StateStoreReader, sttStoreW statestorelib.StateStoreWriter) *UpdateExpenseUseCase {
+func NewUpdateExpenseUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreWriter, sttStoreR statestorelib.StateStoreReader, sttStoreW statestorelib.StateStoreWriter, productSttStoreR statestorelib.StateStoreReader) *UpdateExpenseUseCase {
 	return &UpdateExpenseUseCase{
-		stateEmitter:     sttEmitter,
-		eventStoreWriter: evtStore,
-		stateStoreReader: sttStoreR,
-		stateStoreWriter: sttStoreW,
+		stateEmitter:            sttEmitter,
+		eventStoreWriter:        evtStore,
+		stateStoreReader:        sttStoreR,
+		stateStoreWriter:        sttStoreW,
+		productStateStoreReader: productSttStoreR,
 	}
 }
 
 type UpdateExpenseUseCaseRequest struct {
+	ProductID   *string `json:"product_id"`
 	ID          string
 	AccountID   string
 	Title       string
@@ -37,12 +40,14 @@ type UpdateExpenseUseCaseRequest struct {
 // and emits a message with the new projected state
 func (u *UpdateExpenseUseCase) Execute(request *UpdateExpenseUseCaseRequest) error {
 	command := command.UpdateExpenseCommand{
-		Id:               request.ID,
-		Title:            request.Title,
-		Description:      request.Description,
-		Value:            request.Value,
-		EventStoreWriter: u.eventStoreWriter,
-		StateStoreReader: u.stateStoreReader,
+		ProductID:               request.ProductID,
+		ID:                      request.ID,
+		Title:                   request.Title,
+		Description:             request.Description,
+		Value:                   request.Value,
+		EventStoreWriter:        u.eventStoreWriter,
+		StateStoreReader:        u.stateStoreReader,
+		ProductStateStoreReader: u.productStateStoreReader,
 	}
 	event, err := command.Handle()
 	if err != nil {

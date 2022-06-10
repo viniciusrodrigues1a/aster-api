@@ -9,20 +9,23 @@ import (
 )
 
 type CreateExpenseUseCase struct {
-	stateEmitter           StateEmitter
-	eventStoreStreamWriter eventstorelib.EventStoreStreamWriter
-	stateStoreWriter       statestorelib.StateStoreWriter
+	stateEmitter            StateEmitter
+	eventStoreStreamWriter  eventstorelib.EventStoreStreamWriter
+	productStateStoreReader statestorelib.StateStoreReader
+	stateStoreWriter        statestorelib.StateStoreWriter
 }
 
-func NewCreateExpenseUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreStreamWriter, sttStore statestorelib.StateStoreWriter) *CreateExpenseUseCase {
+func NewCreateExpenseUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreStreamWriter, sttStore statestorelib.StateStoreWriter, productSttStoreR statestorelib.StateStoreReader) *CreateExpenseUseCase {
 	return &CreateExpenseUseCase{
-		stateEmitter:           sttEmitter,
-		eventStoreStreamWriter: evtStore,
-		stateStoreWriter:       sttStore,
+		stateEmitter:            sttEmitter,
+		eventStoreStreamWriter:  evtStore,
+		productStateStoreReader: productSttStoreR,
+		stateStoreWriter:        sttStore,
 	}
 }
 
 type CreateExpenseUseCaseRequest struct {
+	ProductID   *string `json:"product_id"`
 	Title       string
 	Description string
 	Value       int64
@@ -33,10 +36,12 @@ type CreateExpenseUseCaseRequest struct {
 // and emits a message with the new projected state
 func (c *CreateExpenseUseCase) Execute(request *CreateExpenseUseCaseRequest) error {
 	command := command.CreateExpenseCommand{
-		Title:                  request.Title,
-		Description:            request.Description,
-		Value:                  request.Value,
-		EventStoreStreamWriter: c.eventStoreStreamWriter,
+		ProductID:               request.ProductID,
+		Title:                   request.Title,
+		Description:             request.Description,
+		Value:                   request.Value,
+		EventStoreStreamWriter:  c.eventStoreStreamWriter,
+		ProductStateStoreReader: c.productStateStoreReader,
 	}
 	event, err := command.Handle()
 	if err != nil {

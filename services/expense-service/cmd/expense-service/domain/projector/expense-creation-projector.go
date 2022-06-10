@@ -12,6 +12,7 @@ func (p *ExpenseCreationProjector) Project(e *eventlib.BaseEvent) *ExpenseState 
 	payload := e.Payload.(*event.ExpenseWasCreatedEvent)
 
 	return &ExpenseState{
+		ProductID:   payload.ProductID,
 		Title:       payload.Title,
 		Description: payload.Description,
 		Value:       payload.Value,

@@ -6,13 +6,15 @@ import (
 )
 
 type ExpenseWasUpdatedEvent struct {
+	ProductID   *string
 	Title       string
 	Description string
 	Value       int64
 }
 
-func NewExpenseWasUpdatedEvent(title, description string, value int64, id string) *eventlib.BaseEvent {
+func NewExpenseWasUpdatedEvent(productID *string, title, description string, value int64, id string) *eventlib.BaseEvent {
 	payload := &ExpenseWasUpdatedEvent{
+		ProductID:   productID,
 		Title:       title,
 		Description: description,
 		Value:       value,

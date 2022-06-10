@@ -10,11 +10,14 @@ import (
 )
 
 func TestCreateExpenseCommand(t *testing.T) {
+	productID := "product-id-0"
 	cmd := CreateExpenseCommand{
-		Title:                  "My expense",
-		Description:            "My description",
-		Value:                  300,
-		EventStoreStreamWriter: &streamWriterSpy{},
+		ProductID:               &productID,
+		Title:                   "My expense",
+		Description:             "My description",
+		Value:                   300,
+		EventStoreStreamWriter:  &streamWriterSpy{},
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	evt, err := cmd.Handle()
 	if err != nil {
@@ -22,7 +25,7 @@ func TestCreateExpenseCommand(t *testing.T) {
 	}
 
 	got := evt
-	want := event.NewExpenseWasCreatedEvent(cmd.Title, cmd.Description, cmd.Value)
+	want := event.NewExpenseWasCreatedEvent(&productID, cmd.Title, cmd.Description, cmd.Value)
 
 	if !cmp.Equal(got, want, cmpopts.IgnoreFields(eventlib.BaseEvent{}, "Data.StreamId", "Data.Id")) {
 		t.Errorf("got %q, want %q", got, want)
@@ -32,10 +35,11 @@ func TestCreateExpenseCommand(t *testing.T) {
 func TestCreateExpenseCommand_CallsStreamWriterSpy(t *testing.T) {
 	spy := &streamWriterSpy{}
 	cmd := CreateExpenseCommand{
-		Title:                  "My expense",
-		Description:            "My description",
-		Value:                  300,
-		EventStoreStreamWriter: spy,
+		Title:                   "My expense",
+		Description:             "My description",
+		Value:                   300,
+		EventStoreStreamWriter:  spy,
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	_, err := cmd.Handle()
 	if err != nil {
@@ -50,10 +54,11 @@ func TestCreateExpenseCommand_CallsStreamWriterSpy(t *testing.T) {
 func TestCreateExpenseCommand_ReturnStreamWriterError(t *testing.T) {
 	spy := &streamWriterErrorSpy{}
 	cmd := CreateExpenseCommand{
-		Title:                  "My expense",
-		Description:            "My description",
-		Value:                  300,
-		EventStoreStreamWriter: spy,
+		Title:                   "My expense",
+		Description:             "My description",
+		Value:                   300,
+		EventStoreStreamWriter:  spy,
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	_, err := cmd.Handle()
 
@@ -67,9 +72,10 @@ func TestCreateExpenseCommand_ReturnStreamWriterError(t *testing.T) {
 
 func TestCreateExpenseCommand_ReturnsErrTitleIsRequired(t *testing.T) {
 	cmd := CreateExpenseCommand{
-		Description:            "My description",
-		Value:                  300,
-		EventStoreStreamWriter: &streamWriterSpy{},
+		Description:             "My description",
+		Value:                   300,
+		EventStoreStreamWriter:  &streamWriterSpy{},
+		ProductStateStoreReader: &stateReaderSpy{},
 	}
 	_, err := cmd.Handle()
 
@@ -78,5 +84,26 @@ func TestCreateExpenseCommand_ReturnsErrTitleIsRequired(t *testing.T) {
 
 	if !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 		t.Errorf("got %q, want %q", got, want)
+	}
+}
+
+func TestCreateExpenseCommand_ReturnsErrProductCouldntBeFound(t *testing.T) {
+	spy := &stateReaderErrorSpy{thrown: ErrProductCouldntBeFound}
+	productID := "product-id-0"
+	cmd := CreateExpenseCommand{
+		ProductID:               &productID,
+		Title:                   "My expense",
+		Description:             "My description",
+		Value:                   300,
+		EventStoreStreamWriter:  &streamWriterSpy{},
+		ProductStateStoreReader: spy,
+	}
+	_, err := cmd.Handle()
+
+	got := err
+	want := spy.thrown
+
+	if got != want {
+		t.Errorf("got %q, wanted %q", got, want)
 	}
 }

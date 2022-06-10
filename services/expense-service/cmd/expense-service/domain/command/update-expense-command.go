@@ -11,18 +11,20 @@ import (
 )
 
 type UpdateExpenseCommand struct {
-	Id               string
-	Title            string
-	Description      string
-	Value            int64
-	EventStoreWriter eventstorelib.EventStoreWriter
-	StateStoreReader statestorelib.StateStoreReader
+	ProductID               *string
+	ID                      string
+	Title                   string
+	Description             string
+	Value                   int64
+	EventStoreWriter        eventstorelib.EventStoreWriter
+	StateStoreReader        statestorelib.StateStoreReader
+	ProductStateStoreReader statestorelib.StateStoreReader
 }
 
 // Handle stores an ExpenseWasUpdatedEvent to the event store and returns the resulting event.
 // returns ErrExpenseDoesntExist if it can't read the expense state from the state store.
 func (u *UpdateExpenseCommand) Handle() (*eventlib.BaseEvent, error) {
-	stateString, err := u.StateStoreReader.ReadState(u.Id)
+	stateString, err := u.StateStoreReader.ReadState(u.ID)
 	if err != nil {
 		return nil, ErrExpenseDoesntExist
 	}
@@ -39,7 +41,14 @@ func (u *UpdateExpenseCommand) Handle() (*eventlib.BaseEvent, error) {
 		title = expense.Title
 	}
 
-	evt := event.NewExpenseWasUpdatedEvent(title, u.Description, u.Value, u.Id)
+	if u.ProductID != nil {
+		_, productStateErr := u.ProductStateStoreReader.ReadState(*u.ProductID)
+		if productStateErr != nil {
+			return nil, ErrProductCouldntBeFound
+		}
+	}
+
+	evt := event.NewExpenseWasUpdatedEvent(u.ProductID, title, u.Description, u.Value, u.ID)
 
 	_, storeErr := u.EventStoreWriter.StoreEvent(evt)
 	if storeErr != nil {

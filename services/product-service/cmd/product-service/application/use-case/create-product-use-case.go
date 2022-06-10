@@ -21,16 +21,20 @@ func NewCreateProductUseCase(evtStore eventstorelib.EventStoreStreamWriter, sttS
 }
 
 type CreateProductUseCaseRequest struct {
-	Title       string
-	Description string
-	Quantity    int32
+	Title         string
+	Description   string
+	Quantity      int32
+	PurchasePrice int64 `json:"purchase_price"`
+	SalePrice     int64 `json:"sale_price"`
 }
 
 func (c *CreateProductUseCase) Execute(request *CreateProductUseCaseRequest) error {
 	command := command.CreateProductCommand{
-		Title:       request.Title,
-		Description: request.Description,
-		Quantity:    request.Quantity,
+		Title:         request.Title,
+		Description:   request.Description,
+		Quantity:      request.Quantity,
+		PurchasePrice: request.PurchasePrice,
+		SalePrice:     request.SalePrice,
 	}
 	event := command.Handle()
 

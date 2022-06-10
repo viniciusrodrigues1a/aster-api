@@ -27,18 +27,22 @@ func NewUpdateProductUseCase(evtStore eventstorelib.EventStoreWriter, sttStore S
 }
 
 type UpdateProductUseCaseRequest struct {
-	Id          string
-	Title       string
-	Description string
-	Quantity    int32
+	Id            string
+	Title         string
+	Description   string
+	Quantity      int32
+	PurchasePrice int64 `json:"purchase_price"`
+	SalePrice     int64 `json:"sale_price"`
 }
 
 func (u *UpdateProductUseCase) Execute(request *UpdateProductUseCaseRequest) error {
 	command := command.UpdateProductCommand{
-		Title:       request.Title,
-		Description: request.Description,
-		Quantity:    request.Quantity,
-		Id:          request.Id,
+		Title:         request.Title,
+		Description:   request.Description,
+		Quantity:      request.Quantity,
+		PurchasePrice: request.PurchasePrice,
+		SalePrice:     request.SalePrice,
+		Id:            request.Id,
 	}
 	event := command.Handle()
 

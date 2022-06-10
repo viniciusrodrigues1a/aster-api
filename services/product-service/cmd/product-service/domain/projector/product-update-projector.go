@@ -14,11 +14,13 @@ func (p *ProductUpdateProjector) Project(e *eventlib.BaseEvent) *ProductState {
 	payload := e.Payload.(*event.ProductWasUpdatedEvent)
 
 	newState := &ProductState{
-		Title:       payload.Title,
-		Description: payload.Description,
-		Quantity:    payload.Quantity,
-		CreatedAt:   p.CurrentState.CreatedAt,
-		DeletedAt:   p.CurrentState.DeletedAt,
+		Title:         payload.Title,
+		Description:   payload.Description,
+		Quantity:      payload.Quantity,
+		PurchasePrice: payload.PurchasePrice,
+		SalePrice:     payload.SalePrice,
+		CreatedAt:     p.CurrentState.CreatedAt,
+		DeletedAt:     p.CurrentState.DeletedAt,
 	}
 
 	return newState

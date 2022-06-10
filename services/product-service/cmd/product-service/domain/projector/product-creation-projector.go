@@ -12,10 +12,12 @@ func (p *ProductCreationProjector) Project(e *eventlib.BaseEvent) *ProductState 
 	payload := e.Payload.(*event.ProductWasCreatedEvent)
 
 	return &ProductState{
-		Title:       payload.Title,
-		Description: payload.Description,
-		Quantity:    payload.Quantity,
-		CreatedAt:   e.Data.CreatedAt,
-		DeletedAt:   e.Data.DeletedAt,
+		Title:         payload.Title,
+		Description:   payload.Description,
+		Quantity:      payload.Quantity,
+		PurchasePrice: payload.PurchasePrice,
+		SalePrice:     payload.SalePrice,
+		CreatedAt:     e.Data.CreatedAt,
+		DeletedAt:     e.Data.DeletedAt,
 	}
 }

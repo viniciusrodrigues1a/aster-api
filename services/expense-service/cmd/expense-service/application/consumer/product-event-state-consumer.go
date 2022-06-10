@@ -2,8 +2,8 @@ package consumer
 
 import (
 	"encoding/json"
+	"expense-service/cmd/expense-service/external/messaging"
 	"log"
-	"transaction-service/cmd/transaction-service/external/messaging"
 
 	statestorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/state-store-lib"
 )
@@ -47,7 +47,7 @@ func (p *ProductEventStateConsumer) Consume() {
 	}
 
 	q, err := ch.QueueDeclare(
-		"product-event-state-transaction-service",
+		"product-event-state-expense-service",
 		true,
 		false,
 		false,

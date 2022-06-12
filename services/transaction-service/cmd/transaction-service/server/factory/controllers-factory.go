@@ -19,3 +19,9 @@ func MakeDeleteTransactionController() *controller.DeleteTransactionController {
 
 	return controller.NewDeleteTransactionController(useCase)
 }
+
+func MakeDebitMoneyToTransactionController() *controller.DebitMoneyToTransactionController {
+	useCase := makeDebitMoneyToTransactionUseCase()
+
+	return controller.NewDebitMoneyToTransactionController(useCase)
+}

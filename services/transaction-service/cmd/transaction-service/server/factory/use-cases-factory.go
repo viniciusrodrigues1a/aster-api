@@ -21,3 +21,7 @@ func makeUpdateTransactionUseCase() *usecase.UpdateTransactionUseCase {
 func makeDeleteTransactionUseCase() *usecase.DeleteTransactionUseCase {
 	return usecase.NewDeleteTransactionUseCase(stateEmitter, eventStoreRepository, stateStoreRepository, stateStoreRepository)
 }
+
+func makeDebitMoneyToTransactionUseCase() *usecase.DebitMoneyToTransactionUseCase {
+	return usecase.NewDebitMoneyToTransactionUseCase(stateEmitter, eventStoreRepository, stateStoreRepository, stateStoreRepository, productStateStoreRepository)
+}

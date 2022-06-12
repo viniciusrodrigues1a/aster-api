@@ -1,6 +1,8 @@
 package command
 
 import (
+	"encoding/json"
+	"transaction-service/cmd/transaction-service/domain/dto"
 	"transaction-service/cmd/transaction-service/domain/event"
 
 	eventlib "github.com/viniciusrodrigues1a/aster-api/pkg/domain/event-lib"
@@ -27,12 +29,26 @@ func (c *CreateTransactionCommand) Handle() (*eventlib.BaseEvent, error) {
 		return nil, ErrProductIDIsRequired
 	}
 
-	_, stateErr := c.ProductStateStoreReader.ReadState(*c.ProductID)
+	stateString, stateErr := c.ProductStateStoreReader.ReadState(*c.ProductID)
 	if stateErr != nil {
 		return nil, ErrProductCouldntBeFound
 	}
 
-	evt := event.NewTransactionWasCreatedEvent(c.ProductID, c.Quantity, c.ValuePaid, c.Description)
+	product := dto.ProductState{}
+	json.Unmarshal([]byte(stateString), &product)
+
+	totalValue := product.SalePrice * c.Quantity
+
+	if c.ValuePaid > totalValue {
+		return nil, ErrValuePaidCantBeGreaterThanTotalValue
+	}
+
+	status := "open"
+	if c.ValuePaid == totalValue {
+		status = "closed"
+	}
+
+	evt := event.NewTransactionWasCreatedEvent(c.ProductID, status, c.Quantity, c.ValuePaid, c.Description)
 
 	_, err := c.EventStoreStreamWriter.StoreEventStream(evt)
 	if err != nil {

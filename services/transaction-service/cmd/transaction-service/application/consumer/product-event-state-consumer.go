@@ -21,9 +21,9 @@ func NewProductEventStateConsumer(m *messaging.Messaging, sttStoreW statestoreli
 }
 
 type Product struct {
-	ID            string
-	Title         string
-	PurchasePrice int64 `json:"purchase_price"`
+	ID        string
+	Title     string
+	SalePrice int64 `json:"sale_price"`
 }
 
 func (p *ProductEventStateConsumer) Consume() {

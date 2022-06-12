@@ -18,8 +18,14 @@ func (p *TransactionUpdateProjector) Project(e *eventlib.BaseEvent) *Transaction
 		productID = payload.ProductID
 	}
 
+	status := p.CurrentState.Status
+	if payload.Status != "" {
+		status = payload.Status
+	}
+
 	return &TransactionState{
 		ProductID:   productID,
+		Status:      status,
 		Quantity:    payload.Quantity,
 		ValuePaid:   payload.ValuePaid,
 		Description: payload.Description,

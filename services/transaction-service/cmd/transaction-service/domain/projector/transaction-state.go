@@ -2,6 +2,7 @@ package projector
 
 type TransactionState struct {
 	ProductID   *string `json:"product_id"`
+	Status      string  `json:"status"`
 	Quantity    int64   `json:"quantity"`
 	ValuePaid   int64   `json:"value_paid"`
 	Description string  `json:"description"`

@@ -13,6 +13,7 @@ func (p *TransactionCreationProjector) Project(e *eventlib.BaseEvent) *Transacti
 
 	return &TransactionState{
 		ProductID:   payload.ProductID,
+		Status:      payload.Status,
 		Quantity:    payload.Quantity,
 		ValuePaid:   payload.ValuePaid,
 		Description: payload.Description,

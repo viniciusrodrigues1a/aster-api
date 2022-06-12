@@ -44,11 +44,12 @@ func (s *storeWriterErrorSpy) StoreEvent(event *eventlib.BaseEvent) (string, err
 
 type stateReaderSpy struct {
 	calledTimes int
+	returnValue string
 }
 
 func (s *stateReaderSpy) ReadState(key string) (string, error) {
 	s.calledTimes += 1
-	return "", nil
+	return s.returnValue, nil
 }
 
 type stateReaderErrorSpy struct {
@@ -58,4 +59,8 @@ type stateReaderErrorSpy struct {
 func (s *stateReaderErrorSpy) ReadState(key string) (string, error) {
 	s.thrown = ErrTransactionDoesntExist
 	return "", ErrTransactionDoesntExist
+}
+
+func GetJSONOfProductWithPrice(price int64) string {
+	return fmt.Sprintf("{ \"id\": \"product-id-0\", \"title\": \"Mouse pad\", \"sale_price\": %d }", price)
 }

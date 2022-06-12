@@ -7,14 +7,17 @@ import (
 
 type TransactionWasCreatedEvent struct {
 	ProductID   *string
+	Status      string
 	Quantity    int64
 	ValuePaid   int64
+	TotalValue  int64
 	Description string
 }
 
-func NewTransactionWasCreatedEvent(productID *string, quantity, valuePaid int64, description string) *eventlib.BaseEvent {
+func NewTransactionWasCreatedEvent(productID *string, status string, quantity, valuePaid int64, description string) *eventlib.BaseEvent {
 	payload := &TransactionWasCreatedEvent{
 		ProductID:   productID,
+		Status:      status,
 		Quantity:    quantity,
 		ValuePaid:   valuePaid,
 		Description: description,

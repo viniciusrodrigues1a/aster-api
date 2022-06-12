@@ -13,11 +13,11 @@ func TestCreateTransactionCommand(t *testing.T) {
 	productID := "product-id-0"
 	cmd := CreateTransactionCommand{
 		ProductID:               &productID,
-		ValuePaid:               10000,
+		ValuePaid:               200,
 		Quantity:                3,
 		Description:             "My description",
 		EventStoreStreamWriter:  &streamWriterSpy{},
-		ProductStateStoreReader: &stateReaderSpy{},
+		ProductStateStoreReader: &stateReaderSpy{returnValue: GetJSONOfProductWithPrice(100)},
 	}
 	evt, err := cmd.Handle()
 	if err != nil {
@@ -25,7 +25,7 @@ func TestCreateTransactionCommand(t *testing.T) {
 	}
 
 	got := evt
-	want := event.NewTransactionWasCreatedEvent(cmd.ProductID, cmd.Quantity, cmd.ValuePaid, cmd.Description)
+	want := event.NewTransactionWasCreatedEvent(cmd.ProductID, "open", cmd.Quantity, cmd.ValuePaid, cmd.Description)
 
 	if !cmp.Equal(got, want, cmpopts.IgnoreFields(eventlib.BaseEvent{}, "Data.StreamId", "Data.Id")) {
 		t.Errorf("got %q, want %q", got, want)
@@ -34,12 +34,14 @@ func TestCreateTransactionCommand(t *testing.T) {
 
 func TestCreateTransactionCommand_CallsStreamWriterSpy(t *testing.T) {
 	spy := &streamWriterSpy{}
+	productID := "product-id-0"
 	cmd := CreateTransactionCommand{
-		ValuePaid:               10000,
-		Quantity:                1,
+		ProductID:               &productID,
+		ValuePaid:               200,
+		Quantity:                3,
 		Description:             "My description",
 		EventStoreStreamWriter:  spy,
-		ProductStateStoreReader: &stateReaderSpy{},
+		ProductStateStoreReader: &stateReaderSpy{returnValue: GetJSONOfProductWithPrice(100)},
 	}
 	_, err := cmd.Handle()
 	if err != nil {
@@ -53,12 +55,14 @@ func TestCreateTransactionCommand_CallsStreamWriterSpy(t *testing.T) {
 
 func TestCreateTransactionCommand_ReturnStreamWriterError(t *testing.T) {
 	spy := &streamWriterErrorSpy{}
+	productID := "product-id-0"
 	cmd := CreateTransactionCommand{
-		ValuePaid:               10000,
-		Quantity:                1,
+		ProductID:               &productID,
+		ValuePaid:               200,
+		Quantity:                3,
 		Description:             "My description",
 		EventStoreStreamWriter:  spy,
-		ProductStateStoreReader: &stateReaderSpy{},
+		ProductStateStoreReader: &stateReaderSpy{returnValue: GetJSONOfProductWithPrice(100)},
 	}
 	_, err := cmd.Handle()
 
@@ -71,12 +75,14 @@ func TestCreateTransactionCommand_ReturnStreamWriterError(t *testing.T) {
 }
 
 func TestCreateTransactionCommand_ReturnErrQuantityMustBeGreaterThanZero(t *testing.T) {
+	productID := "product-id-0"
 	cmd := CreateTransactionCommand{
-		ValuePaid:               10000,
+		ProductID:               &productID,
+		ValuePaid:               200,
 		Quantity:                0,
 		Description:             "My description",
 		EventStoreStreamWriter:  &streamWriterSpy{},
-		ProductStateStoreReader: &stateReaderSpy{},
+		ProductStateStoreReader: &stateReaderSpy{returnValue: GetJSONOfProductWithPrice(100)},
 	}
 	_, err := cmd.Handle()
 
@@ -84,6 +90,53 @@ func TestCreateTransactionCommand_ReturnErrQuantityMustBeGreaterThanZero(t *test
 	want := ErrQuantityMustBeGreaterThanZero
 
 	if !cmp.Equal(got, want, cmpopts.EquateErrors()) {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}
+
+func TestCreateTransactionCommand_ReturnErrValuePaidCantBeGreaterThanTotalValue(t *testing.T) {
+	productID := "product-id-0"
+	cmd := CreateTransactionCommand{
+		ProductID:               &productID,
+		ValuePaid:               400,
+		Quantity:                3,
+		Description:             "My description",
+		EventStoreStreamWriter:  &streamWriterSpy{},
+		ProductStateStoreReader: &stateReaderSpy{returnValue: GetJSONOfProductWithPrice(100)},
+	}
+	_, err := cmd.Handle()
+
+	got := err
+	want := ErrValuePaidCantBeGreaterThanTotalValue
+
+	if got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}
+
+func TestCreateTransactionCommand_StatusShouldBeClosed(t *testing.T) {
+	productID := "product-id-0"
+	quantity := int64(3)
+	productSalePrice := int64(100)
+	cmd := CreateTransactionCommand{
+		ProductID:               &productID,
+		ValuePaid:               productSalePrice * quantity,
+		Quantity:                quantity,
+		Description:             "My description",
+		EventStoreStreamWriter:  &streamWriterSpy{},
+		ProductStateStoreReader: &stateReaderSpy{returnValue: GetJSONOfProductWithPrice(productSalePrice)},
+	}
+	evt, err := cmd.Handle()
+	if err != nil {
+		t.Errorf("got error: %s", err.Error())
+	}
+
+	expectedEvent := event.NewTransactionWasCreatedEvent(cmd.ProductID, "closed", cmd.Quantity, cmd.ValuePaid, cmd.Description)
+
+	got := evt.Payload.(*event.TransactionWasCreatedEvent).Status
+	want := expectedEvent.Payload.(*event.TransactionWasCreatedEvent).Status
+
+	if got != want {
 		t.Errorf("got %q, want %q", got, want)
 	}
 }

@@ -14,12 +14,12 @@ func TestUpdateTransactionCommand(t *testing.T) {
 	cmd := UpdateTransactionCommand{
 		ProductID:               &productID,
 		ID:                      "transaction-id-0",
-		Quantity:                2,
-		ValuePaid:               10000,
+		ValuePaid:               300,
+		Quantity:                3,
 		Description:             "My description",
 		EventStoreWriter:        &storeWriterSpy{},
 		StateStoreReader:        &stateReaderSpy{},
-		ProductStateStoreReader: &stateReaderSpy{},
+		ProductStateStoreReader: &stateReaderSpy{returnValue: GetJSONOfProductWithPrice(100)},
 	}
 	evt, err := cmd.Handle()
 	if err != nil {
@@ -27,7 +27,7 @@ func TestUpdateTransactionCommand(t *testing.T) {
 	}
 
 	got := evt
-	want := event.NewTransactionWasUpdatedEvent(cmd.ProductID, cmd.Quantity, cmd.ValuePaid, cmd.Description, cmd.ID)
+	want := event.NewTransactionWasUpdatedEvent(cmd.ProductID, "closed", cmd.Quantity, cmd.ValuePaid, cmd.Description, cmd.ID)
 
 	if !cmp.Equal(got, want, cmpopts.IgnoreFields(eventlib.BaseEvent{}, "Data.Id")) {
 		t.Errorf("got %q, want %q", got, want)
@@ -38,11 +38,12 @@ func TestUpdateTransactionCommand_CallsStoreWriterSpy(t *testing.T) {
 	spy := &storeWriterSpy{}
 	cmd := UpdateTransactionCommand{
 		ID:                      "transaction-id-0",
-		ValuePaid:               10000,
+		ValuePaid:               300,
+		Quantity:                3,
 		Description:             "My description",
 		EventStoreWriter:        spy,
-		StateStoreReader:        &stateReaderSpy{},
-		ProductStateStoreReader: &stateReaderSpy{},
+		StateStoreReader:        &stateReaderSpy{returnValue: "{ \"product_id\": \"product-id-0\" }"},
+		ProductStateStoreReader: &stateReaderSpy{returnValue: GetJSONOfProductWithPrice(100)},
 	}
 	_, err := cmd.Handle()
 	if err != nil {
@@ -55,14 +56,15 @@ func TestUpdateTransactionCommand_CallsStoreWriterSpy(t *testing.T) {
 }
 
 func TestUpdateTransactionCommand_CallsStateReaderSpy(t *testing.T) {
-	spy := &stateReaderSpy{}
+	spy := &stateReaderSpy{returnValue: "{ \"product_id\": \"product-id-0\" }"}
 	cmd := UpdateTransactionCommand{
 		ID:                      "transaction-id-0",
-		ValuePaid:               10000,
+		ValuePaid:               300,
+		Quantity:                3,
 		Description:             "My description",
 		EventStoreWriter:        &storeWriterSpy{},
 		StateStoreReader:        spy,
-		ProductStateStoreReader: &stateReaderSpy{},
+		ProductStateStoreReader: &stateReaderSpy{returnValue: GetJSONOfProductWithPrice(100)},
 	}
 	_, err := cmd.Handle()
 	if err != nil {
@@ -78,11 +80,12 @@ func TestUpdateTransactionCommand_ReturnStoreWriterError(t *testing.T) {
 	spy := &storeWriterErrorSpy{}
 	cmd := UpdateTransactionCommand{
 		ID:                      "transaction-id-0",
-		ValuePaid:               10000,
+		ValuePaid:               300,
+		Quantity:                3,
 		Description:             "My description",
 		EventStoreWriter:        spy,
-		StateStoreReader:        &stateReaderSpy{},
-		ProductStateStoreReader: &stateReaderSpy{},
+		StateStoreReader:        &stateReaderSpy{returnValue: "{ \"product_id\": \"product-id-0\" }"},
+		ProductStateStoreReader: &stateReaderSpy{returnValue: GetJSONOfProductWithPrice(100)},
 	}
 	_, err := cmd.Handle()
 
@@ -98,11 +101,12 @@ func TestUpdateTransactionCommand_ReturnStateReaderError(t *testing.T) {
 	spy := &stateReaderErrorSpy{}
 	cmd := UpdateTransactionCommand{
 		ID:                      "transaction-id-0",
-		ValuePaid:               10000,
+		ValuePaid:               300,
+		Quantity:                3,
 		Description:             "My description",
 		EventStoreWriter:        &storeWriterSpy{},
 		StateStoreReader:        spy,
-		ProductStateStoreReader: &stateReaderSpy{},
+		ProductStateStoreReader: &stateReaderSpy{returnValue: GetJSONOfProductWithPrice(100)},
 	}
 	_, err := cmd.Handle()
 

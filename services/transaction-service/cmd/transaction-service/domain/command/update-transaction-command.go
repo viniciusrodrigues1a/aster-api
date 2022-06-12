@@ -2,6 +2,7 @@ package command
 
 import (
 	"encoding/json"
+	"transaction-service/cmd/transaction-service/domain/dto"
 	"transaction-service/cmd/transaction-service/domain/event"
 	"transaction-service/cmd/transaction-service/domain/projector"
 
@@ -41,14 +42,35 @@ func (u *UpdateTransactionCommand) Handle() (*eventlib.BaseEvent, error) {
 		quantity = transaction.Quantity
 	}
 
-	if err != nil {
-		_, err := u.ProductStateStoreReader.ReadState(*u.ProductID)
+	var productStateString string
+	if u.ProductID != nil {
+		stateString, err := u.ProductStateStoreReader.ReadState(*u.ProductID)
+		productStateString = stateString
+		if err != nil {
+			return nil, ErrProductCouldntBeFound
+		}
+	} else {
+		stateString, err := u.ProductStateStoreReader.ReadState(*transaction.ProductID)
+		productStateString = stateString
 		if err != nil {
 			return nil, ErrProductCouldntBeFound
 		}
 	}
 
-	evt := event.NewTransactionWasUpdatedEvent(u.ProductID, quantity, u.ValuePaid, u.Description, u.ID)
+	product := dto.ProductState{}
+	json.Unmarshal([]byte(productStateString), &product)
+
+	totalValue := product.SalePrice * quantity
+	if u.ValuePaid > totalValue {
+		return nil, ErrValuePaidCantBeGreaterThanTotalValue
+	}
+
+	status := "open"
+	if u.ValuePaid == totalValue {
+		status = "closed"
+	}
+
+	evt := event.NewTransactionWasUpdatedEvent(u.ProductID, status, quantity, u.ValuePaid, u.Description, u.ID)
 
 	_, storeErr := u.EventStoreWriter.StoreEvent(evt)
 	if storeErr != nil {

@@ -32,6 +32,7 @@ type AddTransactionToInventoryUseCaseRequest struct {
 	Email       string `json:"account_id"`
 	Description string `json:"description"`
 	ValuePaid   int64  `json:"value_paid"`
+	DeletedAt   int64  `json:"deleted_at"`
 }
 
 func (a *AddTransactionToInventoryUseCase) Execute(request *AddTransactionToInventoryUseCaseRequest) error {
@@ -42,7 +43,7 @@ func (a *AddTransactionToInventoryUseCase) Execute(request *AddTransactionToInve
 	currentState := projector.InventoryState{}
 	json.Unmarshal([]byte(val), &currentState)
 
-	cmd := command.NewAddTransactionToInventoryCommand(request.ID, currentState.ID, request.Description, request.ValuePaid, a.eventStoreWriter)
+	cmd := command.NewAddTransactionToInventoryCommand(request.ID, currentState.ID, request.Description, request.ValuePaid, request.DeletedAt, a.eventStoreWriter)
 	event, err := cmd.Handle()
 	if err != nil {
 		return err

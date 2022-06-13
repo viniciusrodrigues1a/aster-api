@@ -36,6 +36,7 @@ type AddExpenseToInventoryUseCaseRequest struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Value       int64  `json:"value"`
+	DeletedAt   int64  `json:"deleted_at"`
 }
 
 func (a *AddExpenseToInventoryUseCase) Execute(request *AddExpenseToInventoryUseCaseRequest) error {
@@ -46,7 +47,7 @@ func (a *AddExpenseToInventoryUseCase) Execute(request *AddExpenseToInventoryUse
 	currentState := &projector.InventoryState{}
 	json.Unmarshal([]byte(val), &currentState)
 
-	command := command.NewAddExpenseToInventoryCommand(request.ID, currentState.ID, request.Title, request.Description, request.Value, a.eventStoreWriter)
+	command := command.NewAddExpenseToInventoryCommand(request.ID, currentState.ID, request.Title, request.Description, request.Value, request.DeletedAt, a.eventStoreWriter)
 	event, err := command.Handle()
 	if err != nil {
 		return err

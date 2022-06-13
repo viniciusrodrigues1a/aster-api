@@ -11,7 +11,7 @@ func (i *InventoryCreationProjector) Project(id string) *InventoryState {
 	return &InventoryState{
 		ID:           id,
 		Participants: []primitive.ObjectID{},
-		Expenses:     []interface{}{},
-		Transactions: []interface{}{},
+		Expenses:     []Expense{},
+		Transactions: []Transaction{},
 	}
 }

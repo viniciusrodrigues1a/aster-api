@@ -12,6 +12,7 @@ type Transaction struct {
 	TransactionID string
 	Description   string
 	ValuePaid     int64
+	DeletedAt     int64
 }
 
 type AddTransactionToInventoryCommand struct {
@@ -19,20 +20,21 @@ type AddTransactionToInventoryCommand struct {
 	EventStoreWriter eventstorelib.EventStoreWriter
 }
 
-func NewAddTransactionToInventoryCommand(transactionID, inventoryID, description string, valuePaid int64, evtStore eventstorelib.EventStoreWriter) *AddTransactionToInventoryCommand {
+func NewAddTransactionToInventoryCommand(transactionID, inventoryID, description string, valuePaid, deletedAt int64, evtStore eventstorelib.EventStoreWriter) *AddTransactionToInventoryCommand {
 	return &AddTransactionToInventoryCommand{
 		Transaction: Transaction{
 			TransactionID: transactionID,
 			InventoryID:   inventoryID,
 			Description:   description,
 			ValuePaid:     valuePaid,
+			DeletedAt:     deletedAt,
 		},
 		EventStoreWriter: evtStore,
 	}
 }
 
 func (a *AddTransactionToInventoryCommand) Handle() (*eventlib.BaseEvent, error) {
-	evt := event.NewTransactionWasAddedToInventoryEvent(a.TransactionID, a.InventoryID, a.Description, a.ValuePaid)
+	evt := event.NewTransactionWasAddedToInventoryEvent(a.TransactionID, a.InventoryID, a.Description, a.ValuePaid, a.DeletedAt)
 
 	_, err := a.EventStoreWriter.StoreEvent(evt)
 	if err != nil {

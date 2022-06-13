@@ -9,13 +9,15 @@ type TransactionWasAddedToInventoryEvent struct {
 	TransactionID string `json:"id"`
 	Description   string `json:"description"`
 	ValuePaid     int64  `json:"value_paid"`
+	DeletedAt     int64  `json:"deleted_at"`
 }
 
-func NewTransactionWasAddedToInventoryEvent(transactionID, inventoryID, description string, valuePaid int64) *eventlib.BaseEvent {
+func NewTransactionWasAddedToInventoryEvent(transactionID, inventoryID, description string, valuePaid, deletedAt int64) *eventlib.BaseEvent {
 	payload := TransactionWasAddedToInventoryEvent{
 		TransactionID: transactionID,
 		Description:   description,
 		ValuePaid:     valuePaid,
+		DeletedAt:     deletedAt,
 	}
 
 	oid, _ := primitive.ObjectIDFromHex(inventoryID)

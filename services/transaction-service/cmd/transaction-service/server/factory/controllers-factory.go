@@ -25,3 +25,7 @@ func MakeDebitMoneyToTransactionController() *controller.DebitMoneyToTransaction
 
 	return controller.NewDebitMoneyToTransactionController(useCase)
 }
+
+func MakeListTransactionController() *controller.ListTransactionController {
+	return controller.NewListTransactionController(stateStoreRepository, productStateStoreRepository)
+}

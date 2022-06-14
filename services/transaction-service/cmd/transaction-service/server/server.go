@@ -36,6 +36,7 @@ func (s *server) Start() {
 	s.router.HandleFunc("/transactions/{id}", factory.MakeUpdateTransactionController().HandleRequest).Methods("PUT")
 	s.router.HandleFunc("/transactions/{id}", factory.MakeDeleteTransactionController().HandleRequest).Methods("DELETE")
 	s.router.HandleFunc("/transactions/{id}/debit-money", factory.MakeDebitMoneyToTransactionController().HandleRequest).Methods("PATCH")
+	s.router.HandleFunc("/transactions/{id}", factory.MakeListTransactionController().HandleRequest).Methods("GET")
 
 	log.Fatal(s.server.ListenAndServe())
 }

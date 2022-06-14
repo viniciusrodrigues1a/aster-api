@@ -13,5 +13,6 @@ func (i *InventoryCreationProjector) Project(id string) *InventoryState {
 		Participants: []primitive.ObjectID{},
 		Expenses:     []Expense{},
 		Transactions: []Transaction{},
+		Products:     []Product{},
 	}
 }

@@ -34,6 +34,11 @@ func main() {
 		transactionEventStateConsumer.Consume()
 	}()
 
+	go func() {
+		productEventStateConsumer := consumer.NewProductEventStateConsumer(m, factory.MakeAddProductToInventoryUseCase())
+		productEventStateConsumer.Consume()
+	}()
+
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Interrupt)
 	signal.Notify(ch, os.Kill)

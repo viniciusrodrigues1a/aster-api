@@ -37,6 +37,7 @@ func (i *InventoryExpenseAdditionProjector) Project(e *eventlib.BaseEvent) *Inve
 		Participants: i.CurrentState.Participants,
 		Expenses:     newExpenses,
 		Transactions: i.CurrentState.Transactions,
+		Products:     i.CurrentState.Products,
 	}
 }
 

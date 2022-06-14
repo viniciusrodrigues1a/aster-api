@@ -18,6 +18,5 @@ func (p *ProductCreationProjector) Project(e *eventlib.BaseEvent) *ProductState 
 		PurchasePrice: payload.PurchasePrice,
 		SalePrice:     payload.SalePrice,
 		CreatedAt:     e.Data.CreatedAt,
-		DeletedAt:     e.Data.DeletedAt,
 	}
 }

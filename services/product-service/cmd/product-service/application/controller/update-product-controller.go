@@ -31,6 +31,7 @@ func (u *UpdateProductController) HandleRequest(w http.ResponseWriter, r *http.R
 	id := vars["id"]
 
 	body.Id = id
+	body.AccountID = r.Context().Value("account_id").(string)
 
 	err := u.useCase.Execute(&body)
 	if err != nil {

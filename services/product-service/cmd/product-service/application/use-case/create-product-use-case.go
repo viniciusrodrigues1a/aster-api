@@ -23,6 +23,7 @@ func NewCreateProductUseCase(sttEmitter StateEmitter, evtStore eventstorelib.Eve
 }
 
 type CreateProductUseCaseRequest struct {
+	AccountID     string `json:"account_id"`
 	Title         string
 	Description   string
 	Quantity      int32
@@ -53,7 +54,7 @@ func (c *CreateProductUseCase) Execute(request *CreateProductUseCaseRequest) err
 		return stateErr
 	}
 
-	c.stateEmitter.Emit(*state, event.Data.StreamId.Hex())
+	c.stateEmitter.Emit(*state, event.Data.StreamId.Hex(), request.AccountID)
 
 	return nil
 }

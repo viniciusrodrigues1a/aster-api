@@ -18,6 +18,7 @@ func NewProductEventStateEmitter(m *Messaging) *ProductEventStateEmitter {
 
 type ProductEventState struct {
 	ID            string `json:"id"`
+	AccountID     string `json:"account_id"`
 	Title         string `json:"title"`
 	Description   string `json:"description"`
 	Quantity      int32  `json:"quantity"`
@@ -27,7 +28,7 @@ type ProductEventState struct {
 	DeletedAt     int64  `json:"deleted_at,omitempty"`
 }
 
-func (e *ProductEventStateEmitter) Emit(state projector.ProductState, id string) {
+func (e *ProductEventStateEmitter) Emit(state projector.ProductState, id, accountID string) {
 	ch, err := e.messaging.Connection.Channel()
 	if err != nil {
 		log.Fatalf("Couldn't open channel: %s", err)
@@ -35,6 +36,7 @@ func (e *ProductEventStateEmitter) Emit(state projector.ProductState, id string)
 
 	eventState := ProductEventState{
 		ID:            id,
+		AccountID:     accountID,
 		Title:         state.Title,
 		Description:   state.Description,
 		Quantity:      state.Quantity,

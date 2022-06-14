@@ -29,6 +29,7 @@ func NewUpdateProductUseCase(sttEmitter StateEmitter, evtStore eventstorelib.Eve
 }
 
 type UpdateProductUseCaseRequest struct {
+	AccountID     string
 	Id            string
 	Title         string
 	Description   string
@@ -59,7 +60,7 @@ func (u *UpdateProductUseCase) Execute(request *UpdateProductUseCaseRequest) err
 	}
 
 	currentState := projector.ProductState{}
-	json.Unmarshal([]byte(val.(string)), &currentState)
+	json.Unmarshal([]byte(val), &currentState)
 	projector := projector.ProductUpdateProjector{CurrentState: currentState}
 	state := projector.Project(event)
 
@@ -68,7 +69,7 @@ func (u *UpdateProductUseCase) Execute(request *UpdateProductUseCaseRequest) err
 		return stateErr
 	}
 
-	u.stateEmitter.Emit(*state, event.Data.StreamId.Hex())
+	u.stateEmitter.Emit(*state, event.Data.StreamId.Hex(), request.AccountID)
 
 	return nil
 }

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/viniciusrodrigues1a/aster-api/pkg/server/middleware"
 )
 
 type server struct {
@@ -30,6 +31,7 @@ func NewServer() *server {
 }
 
 func (s *server) Start() {
+	s.router.Use(middleware.AuthorizationMiddleware)
 	s.router.HandleFunc("/products", factory.MakeCreateProductController().HandleRequest).Methods("POST")
 	s.router.HandleFunc("/products/{id}", factory.MakeUpdateProductController().HandleRequest).Methods("PUT")
 

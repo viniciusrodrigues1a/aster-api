@@ -35,6 +35,7 @@ func (s *server) Start() {
 	s.router.HandleFunc("/expenses", factory.MakeCreateExpenseController().HandleRequest).Methods("POST")
 	s.router.HandleFunc("/expenses/{id}", factory.MakeUpdateExpenseController().HandleRequest).Methods("PUT")
 	s.router.HandleFunc("/expenses/{id}", factory.MakeDeleteExpenseController().HandleRequest).Methods("DELETE")
+	s.router.HandleFunc("/expenses/{id}", factory.MakeListExpenseController().HandleRequest).Methods("GET")
 
 	log.Fatal(s.server.ListenAndServe())
 }

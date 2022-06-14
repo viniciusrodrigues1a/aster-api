@@ -21,3 +21,7 @@ func MakeDeleteExpenseController() *controller.DeleteExpenseController {
 
 	return controller.NewDeleteExpenseController(useCase)
 }
+
+func MakeListExpenseController() *controller.ListExpenseController {
+	return controller.NewListExpenseController(stateStoreRepository, productStateStoreRepository)
+}

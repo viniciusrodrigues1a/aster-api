@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/viniciusrodrigues1a/aster-api/pkg/server/middleware"
 )
 
 type server struct {
@@ -17,6 +18,7 @@ type server struct {
 
 func New() *server {
 	router := mux.NewRouter()
+
 	httpServer := &http.Server{
 		Handler: router,
 		Addr:    "localhost:8080",
@@ -35,6 +37,8 @@ func (s *server) Start() {
 	transactionsProxy := proxy.New("http://127.0.0.1:8083", "transactions")
 	productsProxy := proxy.New("http://127.0.0.1:8084", "products")
 	inventoriesProxy := proxy.New("http://127.0.0.1:8085", "inventories")
+
+	s.router.Use(middleware.CORSMiddleware)
 
 	s.router.HandleFunc("/accounts/{rest:.*}", accountsProxy.HandleRequest)
 	s.router.HandleFunc("/accounts", accountsProxy.HandleRequest)

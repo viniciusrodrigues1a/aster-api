@@ -32,7 +32,7 @@ func New() *Messaging {
 		nil,
 	)
 	if exchangeErr != nil {
-		log.Fatalf("Couldn't declare exchange: %s", err)
+		log.Fatalf("Couldn't declare exchange: %s", exchangeErr)
 	}
 
 	q, err := ch.QueueDeclare(

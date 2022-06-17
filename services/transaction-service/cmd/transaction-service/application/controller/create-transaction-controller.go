@@ -7,12 +7,14 @@ import (
 )
 
 type CreateTransactionController struct {
-	useCase *usecase.CreateTransactionUseCase
+	useCase        *usecase.CreateTransactionUseCase
+	commandEmitter CommandEmitter
 }
 
-func NewCreateTransactionController(u *usecase.CreateTransactionUseCase) *CreateTransactionController {
+func NewCreateTransactionController(u *usecase.CreateTransactionUseCase, cmdEmitter CommandEmitter) *CreateTransactionController {
 	return &CreateTransactionController{
-		useCase: u,
+		useCase:        u,
+		commandEmitter: cmdEmitter,
 	}
 }
 
@@ -31,4 +33,6 @@ func (c *CreateTransactionController) HandleRequest(w http.ResponseWriter, r *ht
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	c.commandEmitter.Emit(body)
 }

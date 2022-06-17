@@ -16,3 +16,7 @@ func makeCreateProductUseCase() *usecase.CreateProductUseCase {
 func makeUpdateProductUseCase() *usecase.UpdateProductUseCase {
 	return usecase.NewUpdateProductUseCase(stateEmitter, eventStoreRepository, stateStoreRepository)
 }
+
+func MakeSubtractProductQuantityUseCase() *usecase.SubtractProductQuantityUseCase {
+	return usecase.NewSubtractProductQuantityUseCase(eventStoreRepository, stateStoreRepository, stateStoreRepository)
+}

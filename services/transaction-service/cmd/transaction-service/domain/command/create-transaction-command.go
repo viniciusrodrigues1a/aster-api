@@ -37,6 +37,10 @@ func (c *CreateTransactionCommand) Handle() (*eventlib.BaseEvent, error) {
 	product := dto.ProductState{}
 	json.Unmarshal([]byte(stateString), &product)
 
+	if product.Quantity < c.Quantity {
+		return nil, ErrThereIsNotEnoughOfThisProduct
+	}
+
 	totalValue := product.SalePrice * c.Quantity
 
 	if c.ValuePaid > totalValue {

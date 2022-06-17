@@ -1,11 +1,14 @@
 package factory
 
-import "transaction-service/cmd/transaction-service/application/controller"
+import (
+	"transaction-service/cmd/transaction-service/application/controller"
+	"transaction-service/cmd/transaction-service/external/messaging"
+)
 
 func MakeCreateTransactionController() *controller.CreateTransactionController {
 	useCase := makeCreateTransactionUseCase()
 
-	return controller.NewCreateTransactionController(useCase)
+	return controller.NewCreateTransactionController(useCase, messaging.NewSubtractProductQuantityEmitter(MessagingConn))
 }
 
 func MakeUpdateTransactionController() *controller.UpdateTransactionController {

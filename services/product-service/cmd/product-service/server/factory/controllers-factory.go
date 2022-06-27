@@ -12,5 +12,10 @@ func MakeUpdateProductController() *controller.UpdateProductController {
 	useCase := makeUpdateProductUseCase()
 
 	return controller.NewUpdateProductController(useCase)
+}
 
+func MakeDeleteProductController() *controller.DeleteProductController {
+	useCase := makeDeleteProductUseCase()
+
+	return controller.NewDeleteProductController(useCase)
 }

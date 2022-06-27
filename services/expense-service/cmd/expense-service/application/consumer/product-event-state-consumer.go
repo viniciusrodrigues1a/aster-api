@@ -24,6 +24,7 @@ type Product struct {
 	ID            string
 	Title         string
 	PurchasePrice int64 `json:"purchase_price"`
+	DeletedAt     int64 `json:"deleted_at"`
 }
 
 func (p *ProductEventStateConsumer) Consume() {
@@ -89,7 +90,11 @@ func (p *ProductEventStateConsumer) Consume() {
 			product := &Product{}
 			json.Unmarshal(m.Body, product)
 
-			p.stateStoreWriter.StoreState(product.ID, product)
+			if product.DeletedAt > 0 {
+				p.stateStoreWriter.StoreState(product.ID, nil)
+			} else {
+				p.stateStoreWriter.StoreState(product.ID, product)
+			}
 		}
 	}()
 

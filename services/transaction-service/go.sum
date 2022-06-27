@@ -43,6 +43,8 @@ github.com/viniciusrodrigues1a/aster-api v0.0.0-20220615224438-9ac78b15d42f h1:c
 github.com/viniciusrodrigues1a/aster-api v0.0.0-20220615224438-9ac78b15d42f/go.mod h1:umWcXPC3sbADSjK+m8osmsEPhgjmxANoOLsvc3dTDEw=
 github.com/viniciusrodrigues1a/aster-api v0.0.0-20220615234918-d09317d8268f h1:RO9w7i11F0U2v2vTNYy/keL8f1Py/xI5YsMGcR57s8Q=
 github.com/viniciusrodrigues1a/aster-api v0.0.0-20220615234918-d09317d8268f/go.mod h1:umWcXPC3sbADSjK+m8osmsEPhgjmxANoOLsvc3dTDEw=
+github.com/viniciusrodrigues1a/aster-api v0.0.0-20220627190108-2a64c9b94c01 h1:hyurGixpIqsYE48JKMSkyQJVjjfKY0mMB9LxgO6gzAY=
+github.com/viniciusrodrigues1a/aster-api v0.0.0-20220627190108-2a64c9b94c01/go.mod h1:umWcXPC3sbADSjK+m8osmsEPhgjmxANoOLsvc3dTDEw=
 github.com/xdg-go/pbkdf2 v1.0.0 h1:Su7DPu48wXMwC3bs7MCNG+z4FhcyEuz5dlvchbq0B0c=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=
 github.com/xdg-go/scram v1.0.2 h1:akYIkZ28e6A96dkWNJQu3nmCzH3YfwMPQExUYDaRv7w=

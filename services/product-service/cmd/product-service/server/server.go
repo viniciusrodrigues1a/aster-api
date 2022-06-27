@@ -34,6 +34,7 @@ func (s *server) Start() {
 	s.router.Use(middleware.AuthorizationMiddleware)
 	s.router.HandleFunc("/products", factory.MakeCreateProductController().HandleRequest).Methods("POST")
 	s.router.HandleFunc("/products/{id}", factory.MakeUpdateProductController().HandleRequest).Methods("PUT")
+	s.router.HandleFunc("/products/{id}", factory.MakeDeleteProductController().HandleRequest).Methods("DELETE")
 
 	log.Fatal(s.server.ListenAndServe())
 }

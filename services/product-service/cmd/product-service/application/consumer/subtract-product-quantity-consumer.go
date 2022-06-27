@@ -98,6 +98,7 @@ func (s *SubtractProductQuantityCommandConsumer) Consume() {
 			json.Unmarshal(m.Body, body)
 
 			request := &usecase.SubtractProductQuantityUseCaseRequest{
+				AccountID:  body.AccountID,
 				ID:         body.ProductID,
 				Reason:     "Automatically subtracting quantity because a Transaction was created",
 				ByQuantity: body.Quantity,

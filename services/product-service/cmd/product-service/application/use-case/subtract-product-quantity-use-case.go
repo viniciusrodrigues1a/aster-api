@@ -10,13 +10,15 @@ import (
 )
 
 type SubtractProductQuantityUseCase struct {
+	stateEmitter         StateEmitter
 	eventStoreRepository eventstorelib.EventStoreWriter
 	stateStoreReader     statestorelib.StateStoreReader
 	stateStoreWriter     statestorelib.StateStoreWriter
 }
 
-func NewSubtractProductQuantityUseCase(evtStore eventstorelib.EventStoreWriter, sttStoreR statestorelib.StateStoreReader, sttStoreW statestorelib.StateStoreWriter) *SubtractProductQuantityUseCase {
+func NewSubtractProductQuantityUseCase(sttEmitter StateEmitter, evtStore eventstorelib.EventStoreWriter, sttStoreR statestorelib.StateStoreReader, sttStoreW statestorelib.StateStoreWriter) *SubtractProductQuantityUseCase {
 	return &SubtractProductQuantityUseCase{
+		stateEmitter:         sttEmitter,
 		eventStoreRepository: evtStore,
 		stateStoreReader:     sttStoreR,
 		stateStoreWriter:     sttStoreW,
@@ -24,6 +26,7 @@ func NewSubtractProductQuantityUseCase(evtStore eventstorelib.EventStoreWriter, 
 }
 
 type SubtractProductQuantityUseCaseRequest struct {
+	AccountID  string `json:"account_id"`
 	ID         string `json:"id"`
 	Reason     string `json:"reason"`
 	ByQuantity int32  `json:"by_quantity"`
@@ -52,6 +55,8 @@ func (s *SubtractProductQuantityUseCase) Execute(request *SubtractProductQuantit
 	if stateErr != nil {
 		return stateErr
 	}
+
+	s.stateEmitter.Emit(*state, evt.Data.StreamId.Hex(), request.AccountID)
 
 	return nil
 }

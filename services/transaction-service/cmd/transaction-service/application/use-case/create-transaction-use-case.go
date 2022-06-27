@@ -26,10 +26,10 @@ func NewCreateTransactionUseCase(sttEmitter StateEmitter, evtStore eventstorelib
 
 type CreateTransactionUseCaseRequest struct {
 	ProductID   *string `json:"product_id"`
-	AccountID   string
-	Quantity    int64  `json:"quantity"`
-	ValuePaid   int64  `json:"value_paid"`
-	Description string `json:"description"`
+	AccountID   string  `json:"account_id"`
+	Quantity    int64   `json:"quantity"`
+	ValuePaid   int64   `json:"value_paid"`
+	Description string  `json:"description"`
 }
 
 // Issues the CreateTransactionCommand, projects the new state, stores it in the state store

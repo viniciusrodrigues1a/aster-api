@@ -15,7 +15,7 @@ func makeCreateTransactionUseCase() *usecase.CreateTransactionUseCase {
 }
 
 func makeUpdateTransactionUseCase() *usecase.UpdateTransactionUseCase {
-	return usecase.NewUpdateTransactionUseCase(stateEmitter, eventStoreRepository, stateStoreRepository, stateStoreRepository, productStateStoreRepository)
+	return usecase.NewUpdateTransactionUseCase(stateEmitter, eventStoreRepository, stateStoreRepository, stateStoreRepository, productStateStoreRepository, messaging.NewSubtractProductQuantityEmitter(MessagingConn))
 }
 
 func makeDeleteTransactionUseCase() *usecase.DeleteTransactionUseCase {

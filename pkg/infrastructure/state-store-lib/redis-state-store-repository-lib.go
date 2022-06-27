@@ -24,6 +24,11 @@ type StateStoreWriter interface {
 }
 
 func (r *RedisStateStoreRepository) StoreState(id string, state interface{}) error {
+	if state == nil {
+		r.Client.Del(r.Context, id)
+		return nil
+	}
+
 	stateJSON, err := json.Marshal(state)
 	if err != nil {
 		return err

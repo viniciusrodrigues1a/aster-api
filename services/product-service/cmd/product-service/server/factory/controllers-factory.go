@@ -19,3 +19,9 @@ func MakeDeleteProductController() *controller.DeleteProductController {
 
 	return controller.NewDeleteProductController(useCase)
 }
+
+func MakeAddProductQuantityController() *controller.AddProductQuantityController {
+	useCase := makeAddProductQuantityUseCase()
+
+	return controller.NewAddProductQuantityController(useCase)
+}

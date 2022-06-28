@@ -20,6 +20,7 @@ func (i *InventoryProductAdditionProjector) Project(e *eventlib.BaseEvent) *Inve
 		Title:         payload.Title,
 		Description:   payload.Description,
 		Quantity:      payload.Quantity,
+		Image:         payload.Image,
 		PurchasePrice: payload.PurchasePrice,
 		SalePrice:     payload.SalePrice,
 	}

@@ -1,6 +1,6 @@
 package dto
 
 type ProductImage struct {
-	base64   string
-	mimeType string
+	Base64   string
+	MimeType string
 }

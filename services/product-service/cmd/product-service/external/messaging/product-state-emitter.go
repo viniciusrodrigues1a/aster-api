@@ -3,6 +3,7 @@ package messaging
 import (
 	"encoding/json"
 	"log"
+	"product-service/cmd/product-service/domain/dto"
 	"product-service/cmd/product-service/domain/projector"
 
 	"github.com/streadway/amqp"
@@ -17,15 +18,16 @@ func NewProductEventStateEmitter(m *Messaging) *ProductEventStateEmitter {
 }
 
 type ProductEventState struct {
-	ID            string `json:"id"`
-	AccountID     string `json:"account_id"`
-	Title         string `json:"title"`
-	Description   string `json:"description"`
-	Quantity      int32  `json:"quantity"`
-	PurchasePrice int64  `json:"purchase_price"`
-	SalePrice     int64  `json:"sale_price"`
-	CreatedAt     int64  `json:"created_at"`
-	DeletedAt     int64  `json:"deleted_at,omitempty"`
+	ID            string            `json:"id"`
+	AccountID     string            `json:"account_id"`
+	Title         string            `json:"title"`
+	Description   string            `json:"description"`
+	Quantity      int32             `json:"quantity"`
+	PurchasePrice int64             `json:"purchase_price"`
+	SalePrice     int64             `json:"sale_price"`
+	Image         *dto.ProductImage `json:"image"`
+	CreatedAt     int64             `json:"created_at"`
+	DeletedAt     int64             `json:"deleted_at,omitempty"`
 }
 
 func (e *ProductEventStateEmitter) Emit(state projector.ProductState, id, accountID string) {
@@ -42,6 +44,7 @@ func (e *ProductEventStateEmitter) Emit(state projector.ProductState, id, accoun
 		Quantity:      state.Quantity,
 		PurchasePrice: state.PurchasePrice,
 		SalePrice:     state.SalePrice,
+		Image:         state.Image,
 		CreatedAt:     state.CreatedAt,
 		DeletedAt:     state.DeletedAt,
 	}

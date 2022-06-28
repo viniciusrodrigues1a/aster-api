@@ -1,6 +1,7 @@
 package command
 
 import (
+	"inventory-service/cmd/inventory-service/domain/dto"
 	"inventory-service/cmd/inventory-service/domain/event"
 
 	eventlib "github.com/viniciusrodrigues1a/aster-api/pkg/domain/event-lib"
@@ -16,6 +17,7 @@ type Product struct {
 	PurchasePrice int64
 	SalePrice     int64
 	DeletedAt     int64
+	Image         *dto.ProductImage
 }
 
 type AddProductToInventoryCommand struct {
@@ -23,7 +25,7 @@ type AddProductToInventoryCommand struct {
 	EventStoreWriter eventstorelib.EventStoreWriter
 }
 
-func NewAddProductToInventoryCommand(productID, inventoryID, title, description string, quantity, purchasePrice, salePrice, deletedAt int64, evtStoreW eventstorelib.EventStoreWriter) *AddProductToInventoryCommand {
+func NewAddProductToInventoryCommand(productID, inventoryID, title, description string, quantity, purchasePrice, salePrice, deletedAt int64, image *dto.ProductImage, evtStoreW eventstorelib.EventStoreWriter) *AddProductToInventoryCommand {
 	return &AddProductToInventoryCommand{
 		Product: Product{
 			ProductID:     productID,
@@ -34,13 +36,14 @@ func NewAddProductToInventoryCommand(productID, inventoryID, title, description 
 			PurchasePrice: purchasePrice,
 			SalePrice:     salePrice,
 			DeletedAt:     deletedAt,
+			Image:         image,
 		},
 		EventStoreWriter: evtStoreW,
 	}
 }
 
 func (a *AddProductToInventoryCommand) Handle() (*eventlib.BaseEvent, error) {
-	evt := event.NewProductWasAddedToInventoryEvent(a.ProductID, a.InventoryID, a.Title, a.Description, a.Quantity, a.PurchasePrice, a.SalePrice, a.DeletedAt)
+	evt := event.NewProductWasAddedToInventoryEvent(a.ProductID, a.InventoryID, a.Title, a.Description, a.Quantity, a.PurchasePrice, a.SalePrice, a.DeletedAt, a.Image)
 
 	_, err := a.EventStoreWriter.StoreEvent(evt)
 	if err != nil {

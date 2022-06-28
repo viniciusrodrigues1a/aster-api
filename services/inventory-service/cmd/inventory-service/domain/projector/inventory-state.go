@@ -1,6 +1,10 @@
 package projector
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"inventory-service/cmd/inventory-service/domain/dto"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Expense struct {
 	ID          string `json:"id"`
@@ -16,13 +20,14 @@ type Transaction struct {
 }
 
 type Product struct {
-	ID            string `json:"id"`
-	Title         string `json:"title"`
-	Description   string `json:"description"`
-	Quantity      int64  `json:"quantity"`
-	PurchasePrice int64  `json:"purchase_price"`
-	SalePrice     int64  `json:"sale_price"`
-	DeletedAt     int64  `json:"deleted_at"`
+	ID            string            `json:"id"`
+	Title         string            `json:"title"`
+	Description   string            `json:"description"`
+	Quantity      int64             `json:"quantity"`
+	PurchasePrice int64             `json:"purchase_price"`
+	SalePrice     int64             `json:"sale_price"`
+	DeletedAt     int64             `json:"deleted_at"`
+	Image         *dto.ProductImage `json:"image"`
 }
 
 type InventoryState struct {

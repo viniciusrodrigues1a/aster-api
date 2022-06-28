@@ -14,6 +14,7 @@ func (p *ProductCreationProjector) Project(e *eventlib.BaseEvent) *ProductState 
 	return &ProductState{
 		Title:         payload.Title,
 		Description:   payload.Description,
+		Image:         payload.Image,
 		Quantity:      payload.Quantity,
 		PurchasePrice: payload.PurchasePrice,
 		SalePrice:     payload.SalePrice,

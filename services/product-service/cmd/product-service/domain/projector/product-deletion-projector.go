@@ -15,6 +15,7 @@ func (p *ProductDeletionProjector) Project(e *eventlib.BaseEvent) *ProductState 
 		Title:         p.CurrentState.Title,
 		Description:   p.CurrentState.Description,
 		Quantity:      p.CurrentState.Quantity,
+		Image:         p.CurrentState.Image,
 		PurchasePrice: p.CurrentState.PurchasePrice,
 		SalePrice:     p.CurrentState.SalePrice,
 		CreatedAt:     p.CurrentState.CreatedAt,

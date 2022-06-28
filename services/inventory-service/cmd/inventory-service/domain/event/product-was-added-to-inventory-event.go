@@ -1,6 +1,8 @@
 package event
 
 import (
+	"inventory-service/cmd/inventory-service/domain/dto"
+
 	eventlib "github.com/viniciusrodrigues1a/aster-api/pkg/domain/event-lib"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -13,9 +15,10 @@ type ProductWasAddedToInventoryEvent struct {
 	PurchasePrice int64  `json:"purchase_price"`
 	SalePrice     int64  `json:"sale_price"`
 	DeletedAt     int64  `json:"deleted_at"`
+	Image         *dto.ProductImage
 }
 
-func NewProductWasAddedToInventoryEvent(productID, inventoryID, title, description string, quantity, purchasePrice, salePrice, deletedAt int64) *eventlib.BaseEvent {
+func NewProductWasAddedToInventoryEvent(productID, inventoryID, title, description string, quantity, purchasePrice, salePrice, deletedAt int64, image *dto.ProductImage) *eventlib.BaseEvent {
 	payload := ProductWasAddedToInventoryEvent{
 		ProductID:     productID,
 		Title:         title,
@@ -24,6 +27,7 @@ func NewProductWasAddedToInventoryEvent(productID, inventoryID, title, descripti
 		PurchasePrice: purchasePrice,
 		SalePrice:     salePrice,
 		DeletedAt:     deletedAt,
+		Image:         image,
 	}
 
 	oid, _ := primitive.ObjectIDFromHex(inventoryID)

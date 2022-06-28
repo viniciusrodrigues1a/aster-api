@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"product-service/cmd/product-service/domain/command"
+	"product-service/cmd/product-service/domain/dto"
 	"product-service/cmd/product-service/domain/projector"
 
 	eventstorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/event-store-lib"
@@ -27,8 +28,9 @@ type CreateProductUseCaseRequest struct {
 	Title         string
 	Description   string
 	Quantity      int32
-	PurchasePrice int64 `json:"purchase_price"`
-	SalePrice     int64 `json:"sale_price"`
+	PurchasePrice int64             `json:"purchase_price"`
+	SalePrice     int64             `json:"sale_price"`
+	Image         *dto.ProductImage `json:"image"`
 }
 
 func (c *CreateProductUseCase) Execute(request *CreateProductUseCaseRequest) error {
@@ -38,6 +40,7 @@ func (c *CreateProductUseCase) Execute(request *CreateProductUseCaseRequest) err
 		Quantity:      request.Quantity,
 		PurchasePrice: request.PurchasePrice,
 		SalePrice:     request.SalePrice,
+		Image:         request.Image,
 	}
 	event := command.Handle()
 

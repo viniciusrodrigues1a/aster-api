@@ -3,6 +3,7 @@ package usecase
 import (
 	"encoding/json"
 	"inventory-service/cmd/inventory-service/domain/command"
+	"inventory-service/cmd/inventory-service/domain/dto"
 	"inventory-service/cmd/inventory-service/domain/projector"
 
 	eventstorelib "github.com/viniciusrodrigues1a/aster-api/pkg/infrastructure/event-store-lib"
@@ -28,14 +29,15 @@ func NewAddProductToInventoryUseCase(
 }
 
 type AddProductToInventoryUseCaseRequest struct {
-	ID            string `json:"id"`
-	Email         string `json:"account_id"`
-	Title         string `json:"title"`
-	Description   string `json:"description"`
-	Quantity      int64  `json:"quantity"`
-	PurchasePrice int64  `json:"purchase_price"`
-	SalePrice     int64  `json:"sale_price"`
-	DeletedAt     int64  `json:"deleted_at"`
+	ID            string            `json:"id"`
+	Email         string            `json:"account_id"`
+	Title         string            `json:"title"`
+	Description   string            `json:"description"`
+	Quantity      int64             `json:"quantity"`
+	PurchasePrice int64             `json:"purchase_price"`
+	SalePrice     int64             `json:"sale_price"`
+	DeletedAt     int64             `json:"deleted_at"`
+	Image         *dto.ProductImage `json:"image"`
 }
 
 func (a *AddProductToInventoryUseCase) Execute(request *AddProductToInventoryUseCaseRequest) error {
@@ -46,7 +48,7 @@ func (a *AddProductToInventoryUseCase) Execute(request *AddProductToInventoryUse
 	currentState := projector.InventoryState{}
 	json.Unmarshal([]byte(val), &currentState)
 
-	cmd := command.NewAddProductToInventoryCommand(request.ID, currentState.ID, request.Title, request.Description, request.Quantity, request.PurchasePrice, request.SalePrice, request.DeletedAt, a.eventStoreWriter)
+	cmd := command.NewAddProductToInventoryCommand(request.ID, currentState.ID, request.Title, request.Description, request.Quantity, request.PurchasePrice, request.SalePrice, request.DeletedAt, request.Image, a.eventStoreWriter)
 	evt, err := cmd.Handle()
 	if err != nil {
 		return err

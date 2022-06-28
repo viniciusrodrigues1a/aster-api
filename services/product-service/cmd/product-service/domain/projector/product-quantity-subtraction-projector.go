@@ -19,6 +19,7 @@ func (p *ProductQuantitySubtractionProjector) Project(e *eventlib.BaseEvent) *Pr
 		Title:         p.CurrentState.Title,
 		Description:   p.CurrentState.Description,
 		Quantity:      newQuantity,
+		Image:         p.CurrentState.Image,
 		PurchasePrice: p.CurrentState.PurchasePrice,
 		SalePrice:     p.CurrentState.SalePrice,
 		CreatedAt:     p.CurrentState.CreatedAt,

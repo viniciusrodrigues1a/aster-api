@@ -1,6 +1,7 @@
 package command
 
 import (
+	"product-service/cmd/product-service/domain/dto"
 	"product-service/cmd/product-service/domain/event"
 
 	eventlib "github.com/viniciusrodrigues1a/aster-api/pkg/domain/event-lib"
@@ -12,8 +13,9 @@ type CreateProductCommand struct {
 	Quantity      int32
 	PurchasePrice int64
 	SalePrice     int64
+	Image         *dto.ProductImage
 }
 
 func (c *CreateProductCommand) Handle() *eventlib.BaseEvent {
-	return event.NewProductWasCreatedEvent(c.Title, c.Description, c.Quantity, c.PurchasePrice, c.SalePrice)
+	return event.NewProductWasCreatedEvent(c.Title, c.Description, c.Quantity, c.PurchasePrice, c.SalePrice, c.Image)
 }

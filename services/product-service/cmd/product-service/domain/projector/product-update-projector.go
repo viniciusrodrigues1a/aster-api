@@ -19,6 +19,7 @@ func (p *ProductUpdateProjector) Project(e *eventlib.BaseEvent) *ProductState {
 		Quantity:      payload.Quantity,
 		PurchasePrice: payload.PurchasePrice,
 		SalePrice:     payload.SalePrice,
+		Image:         p.CurrentState.Image,
 		CreatedAt:     p.CurrentState.CreatedAt,
 		DeletedAt:     p.CurrentState.DeletedAt,
 	}

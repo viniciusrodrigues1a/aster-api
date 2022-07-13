@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	usecase "transaction-service/cmd/transaction-service/application/use-case"
+	"transaction-service/cmd/transaction-service/domain/command"
 )
 
 type CreateTransactionController struct {
@@ -30,8 +31,18 @@ func (c *CreateTransactionController) HandleRequest(w http.ResponseWriter, r *ht
 	body.AccountID = r.Context().Value("account_id").(string)
 
 	err := c.useCase.Execute(&body)
+	status := http.StatusInternalServerError
+
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err == command.ErrProductIDIsRequired ||
+			err == command.ErrQuantityMustBeGreaterThanZero ||
+			err == command.ErrProductCouldntBeFound ||
+			err == command.ErrThereIsNotEnoughOfThisProduct ||
+			err == command.ErrValuePaidCantBeGreaterThanTotalValue {
+			status = http.StatusBadRequest
+		}
+
+		http.Error(w, err.Error(), status)
 	}
 
 	c.commandEmitter.Emit(body)

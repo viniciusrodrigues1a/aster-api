@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	usecase "expense-service/cmd/expense-service/application/use-case"
+	"expense-service/cmd/expense-service/domain/command"
 	"net/http"
 )
 
@@ -29,6 +30,14 @@ func (c *CreateExpenseController) HandleRequest(w http.ResponseWriter, r *http.R
 
 	err := c.useCase.Execute(&body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		status := http.StatusInternalServerError
+
+		if err == command.ErrTitleIsRequired ||
+			err == command.ErrProductCouldntBeFound ||
+			err == command.ErrValueCantBeZero {
+			status = http.StatusBadRequest
+		}
+
+		http.Error(w, err.Error(), status)
 	}
 }

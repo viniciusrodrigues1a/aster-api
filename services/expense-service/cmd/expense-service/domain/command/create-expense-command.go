@@ -30,6 +30,10 @@ func (c *CreateExpenseCommand) Handle() (*eventlib.BaseEvent, error) {
 		}
 	}
 
+	if c.Value == 0 {
+		return nil, ErrValueCantBeZero
+	}
+
 	evt := event.NewExpenseWasCreatedEvent(c.ProductID, c.Title, c.Description, c.Value)
 
 	_, storeErr := c.EventStoreStreamWriter.StoreEventStream(evt)

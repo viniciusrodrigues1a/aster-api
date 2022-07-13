@@ -74,6 +74,14 @@ func (c *CreateProductController) HandleRequest(w http.ResponseWriter, r *http.R
 		Image:         image,
 	})
 	if useCaseErr != nil {
-		http.Error(w, useCaseErr.Error(), http.StatusInternalServerError)
+		status := http.StatusInternalServerError
+
+		if useCaseErr == usecase.ErrTitleIsEmpty ||
+			useCaseErr == usecase.ErrPurchasePriceZero ||
+			useCaseErr == usecase.ErrSalePriceZero {
+			status = http.StatusBadRequest
+		}
+
+		http.Error(w, useCaseErr.Error(), status)
 	}
 }
